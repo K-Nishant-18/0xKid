@@ -153,7 +153,7 @@ const CodeEditor = ({ theme = 'dark' }) => {
   };
 
   return (
-    <div className={`bg-gray-900 rounded-2xl overflow-hidden border border-gray-700 ${isFullscreen ? 'fixed inset-0 z-50 m-0 rounded-none' : ''}`}>
+    <div className={`bg-gray-900 rounded-2xl overflow-hidden border border-gray-700 ${isFullscreen ? 'fixed inset-0 z-50 m-0 rounded-none' : 'w-full max-w-4xl mx-auto my-8'}`}>
       {/* Header */}
       <div className="bg-gray-800 px-6 py-4 flex items-center justify-between border-b border-gray-700">
         <div className="flex items-center gap-4">

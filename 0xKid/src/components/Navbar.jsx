@@ -37,11 +37,12 @@ const Navbar = () => {
   { path: '/quests', icon: Map, label: 'Quests' },
   { path: '/ai-teaching', icon: Brain, label: 'AI Teaching' },
   { path: '/projects', icon: Code, label: 'Projects' },
-//   { path: '/game-studio', icon: Gamepad2, label: 'Game Studio' },
-//   { path: '/collaboration', icon: Users, label: 'Collaborate' },
+  { path: '/game-studio', icon: Gamepad2, label: 'Game Studio' },
+  { path: '/collaboration', icon: Users, label: 'Collaborate' },
 //   { path: '/community', icon: Globe, label: 'Community' },
-//   { path: '/mindfulness', icon: Heart, label: 'Mindfulness' },
-//   { path: '/parent-dashboard', icon: BarChart3, label: 'Parent View' },
+  { path: '/mindfulness', icon: Heart, label: 'Mindfulness' },
+  { path: '/parent-dashboard', icon: BarChart3, label: 'Parent View' },
+  { path: '/code-editor', icon: Code, label: 'Code Editor' }
 ];
 
 const isActive = (path) => location.pathname === path;
@@ -53,14 +54,14 @@ const isActive = (path) => location.pathname === path;
 
   return (
     <>
-      <nav className="bg-black/20 backdrop-blur-md border-b border-white/10 sticky top-0 z-40">
+      <nav className="bg-black/20 backdrop-blur-md border-b border-white/10 sticky top-0 z-400">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
             <Link to="/" className="flex items-center gap-2">
               <Sparkles className="w-8 h-8 text-yellow-400" />
               <span className="text-2xl font-bold bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">
-                CodeVerse
+                0xKid
               </span>
             </Link>
 

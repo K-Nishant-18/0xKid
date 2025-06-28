@@ -18,6 +18,8 @@ import AIMentor from './components/AIMentor';
 import ProtectedRoute from './components/ProtectedRoute';
 import AuthProvider from './contexts/AuthContext';
 import AboutUs from './components/AboutUs';
+import CodeEditor from './components/CodeEditor';
+
 
 function AppContent() {
   const [selectedQuest, setSelectedQuest] = useState(null);
@@ -33,6 +35,7 @@ function AppContent() {
       <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900">
         <Routes>
           <Route path="/" element={<LandingPage />} />
+          <Route path="/code-editor" element={<CodeEditor/>}/>
           <Route path="/about" element={<AboutUs />} />
           
           {/* Protected Routes */}

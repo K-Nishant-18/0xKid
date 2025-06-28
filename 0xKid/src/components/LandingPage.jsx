@@ -103,7 +103,7 @@ const safetyFeatures = [
 
 const navItems = [
   { name: 'Home', icon: <Home className="w-5 h-5" />, path: '/' },
-  { name: 'Courses', icon: <BookOpen className="w-5 h-5" />, path: '/courses' },
+  { name: 'Code Editor', icon: <BookOpen className="w-5 h-5" />, path: '/code-editor' },
   { name: 'About Us', icon: <Users className="w-5 h-5" />, path: '/about' },
   { name: 'Leaderboard', icon: <Trophy className="w-5 h-5" />, path: '/leaderboard' },
   { name: 'Profile', icon: <UserIcon className="w-5 h-5" />, path: '/profile' },
