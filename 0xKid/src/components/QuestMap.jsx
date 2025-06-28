@@ -21,87 +21,163 @@ const QuestMap = ({ onQuestSelect }) => {
   const quests = [
     {
       id: 1,
-      title: "Code Basics Island",
-      description: "Learn the fundamentals of programming with drag-and-drop blocks",
+      title: "The Talking Screen",
+      description: "In C-Land, help Captain Code make his silent robot speak using printf!",
       difficulty: "Beginner",
       xp: 100,
       status: "completed",
       progress: 100,
-      chapters: 5,
-      completedChapters: 5,
-      icon: "🏝️",
-      color: "from-green-500 to-emerald-500",
-      skills: ["Variables", "Loops", "Functions"]
+      chapters: 1,
+      completedChapters: 1,
+      icon: "🗣️",
+      color: "from-blue-500 to-cyan-500",
+      skills: ["printf", "Output"],
+      code: `printf("Hello, I am a robot!");`,
+      lesson: "printf lets your code show messages to the user."
     },
     {
       id: 2,
-      title: "Space Rescue Mission",
-      description: "Help astronauts fix their spaceship using conditional logic",
+      title: "Captain Code’s Treasure Boxes",
+      description: "Organize Captain Code’s treasures using variables to keep track of items.",
       difficulty: "Beginner",
       xp: 150,
       status: "active",
       progress: 75,
-      chapters: 6,
-      completedChapters: 4,
-      icon: "🚀",
-      color: "from-purple-500 to-pink-500",
-      skills: ["If/Else", "Boolean Logic", "Problem Solving"]
+      chapters: 2,
+      completedChapters: 1,
+      icon: "🎒",
+      color: "from-green-500 to-emerald-500",
+      skills: ["Variables", "Data Types"],
+      code: `int coins = 50;\nchar grade = 'A';`,
+      lesson: "Variables are used to store data in named containers."
     },
     {
       id: 3,
-      title: "Underwater Adventure",
-      description: "Explore the ocean depths while learning about arrays and data",
-      difficulty: "Intermediate",
+      title: "The Math Machine",
+      description: "Power up the legendary Math Machine with arithmetic operations.",
+      difficulty: "Beginner",
       xp: 200,
       status: "locked",
       progress: 0,
-      chapters: 7,
+      chapters: 2,
       completedChapters: 0,
-      icon: "🌊",
-      color: "from-blue-500 to-cyan-500",
-      skills: ["Arrays", "Data Structures", "Algorithms"]
+      icon: "➕",
+      color: "from-yellow-500 to-orange-500",
+      skills: ["Arithmetic", "Operators"],
+      code: `int a = 6, b = 3;\nprintf("%d", a + b);`,
+      lesson: "Use arithmetic operators to do math in C."
     },
     {
       id: 4,
-      title: "Magical Forest Quest",
-      description: "Cast spells with code in an enchanted forest full of mysteries",
+      title: "The Gate of Choices",
+      description: "Navigate a talking gate by mastering if-else decision-making.",
       difficulty: "Intermediate",
       xp: 250,
       status: "locked",
       progress: 0,
-      chapters: 8,
+      chapters: 3,
       completedChapters: 0,
-      icon: "🌲",
-      color: "from-emerald-500 to-green-500",
-      skills: ["Object-Oriented", "Classes", "Inheritance"]
+      icon: "🚪",
+      color: "from-purple-500 to-pink-500",
+      skills: ["if-else", "Conditional Logic"],
+      code: `int num = 12;\nif(num > 10) {\n  printf("You may enter!");\n} else {\n  printf("Access denied!");\n}`,
+      lesson: "Use if-else to choose different paths in your program."
     },
     {
       id: 5,
-      title: "Cyberpunk City",
-      description: "Hack your way through a futuristic city using advanced algorithms",
-      difficulty: "Advanced",
-      xp: 350,
+      title: "The Garden of Loops",
+      description: "Plant a blooming garden using for loops to automate tasks.",
+      difficulty: "Intermediate",
+      xp: 300,
       status: "locked",
       progress: 0,
-      chapters: 10,
+      chapters: 3,
       completedChapters: 0,
-      icon: "🌃",
-      color: "from-indigo-500 to-purple-500",
-      skills: ["APIs", "Databases", "Real-time Data"]
+      icon: "🌼",
+      color: "from-emerald-500 to-teal-500",
+      skills: ["for loop", "Iteration"],
+      code: `for(int i = 1; i <= 10; i++) {\n  printf("Planting flower %d\\n", i);\n}`,
+      lesson: "Use for loops to repeat something a set number of times."
     },
     {
       id: 6,
-      title: "AI Robot Factory",
-      description: "Build and program AI robots in a high-tech factory",
+      title: "Ask and You Shall Code",
+      description: "Create an interactive program that listens to kids using scanf.",
+      difficulty: "Intermediate",
+      xp: 350,
+      status: "locked",
+      progress: 0,
+      chapters: 3,
+      completedChapters: 0,
+      icon: "🎤",
+      color: "from-red-500 to-pink-500",
+      skills: ["scanf", "User Input"],
+      code: `char name[20];\nint age;\nscanf("%s", name);\nscanf("%d", &age);`,
+      lesson: "Use scanf to get input from the user."
+    },
+    {
+      id: 7,
+      title: "Captain Code’s Tool Kit",
+      description: "Build reusable tools with functions to simplify Captain Code’s tasks.",
       difficulty: "Advanced",
       xp: 400,
       status: "locked",
       progress: 0,
-      chapters: 12,
+      chapters: 4,
       completedChapters: 0,
-      icon: "🤖",
-      color: "from-red-500 to-orange-500",
-      skills: ["Machine Learning", "Neural Networks", "AI Ethics"]
+      icon: "🔧",
+      color: "from-indigo-500 to-blue-500",
+      skills: ["Functions", "Code Reusability"],
+      code: `void jump() {\n  printf("Jumping high!");\n}`,
+      lesson: "Functions let you reuse blocks of code by giving them names."
+    },
+    {
+      id: 8,
+      title: "The Train of Numbers",
+      description: "Deliver gifts efficiently using arrays to store multiple values.",
+      difficulty: "Advanced",
+      xp: 450,
+      status: "locked",
+      progress: 0,
+      chapters: 4,
+      completedChapters: 0,
+      icon: "🚂",
+      color: "from-orange-500 to-red-500",
+      skills: ["Arrays", "Data Storage"],
+      code: `int gifts[5] = {1, 2, 3, 4, 5};\nprintf("%d", gifts[2]); // 3`,
+      lesson: "Arrays store many values in one container."
+    },
+    {
+      id: 9,
+      title: "The Echo Cave",
+      description: "Master while loops to make echoes repeat in the mysterious cave.",
+      difficulty: "Advanced",
+      xp: 500,
+      status: "locked",
+      progress: 0,
+      chapters: 4,
+      completedChapters: 0,
+      icon: "🔄",
+      color: "from-cyan-500 to-blue-500",
+      skills: ["while loop", "Iteration"],
+      code: `int count = 1;\nwhile(count <= 3) {\n  printf("Echo %d\\n", count);\n  count++;\n}`,
+      lesson: "while loops repeat as long as the condition is true."
+    },
+    {
+      id: 10,
+      title: "The Tunnel of One Step",
+      description: "Take at least one step in a dark tunnel using do-while loops.",
+      difficulty: "Advanced",
+      xp: 550,
+      status: "locked",
+      progress: 0,
+      chapters: 4,
+      completedChapters: 0,
+      icon: "🚶",
+      color: "from-gray-500 to-indigo-500",
+      skills: ["do-while loop", "Iteration"],
+      code: `int steps = 1;\ndo {\n  printf("Step %d\\n", steps);\n  steps++;\n} while(steps <= 3);`,
+      lesson: "do-while loops run at least once, even if the condition is false."
     }
   ];
 
@@ -131,6 +207,7 @@ const QuestMap = ({ onQuestSelect }) => {
 
   const handleQuestClick = (quest) => {
     if (quest.status !== 'locked') {
+      setSelectedQuest(quest.id === selectedQuest ? null : quest.id);
       onQuestSelect?.(quest.id);
     }
   };
@@ -149,17 +226,17 @@ const QuestMap = ({ onQuestSelect }) => {
             <div>
               <h1 className="text-4xl font-bold mb-2 flex items-center gap-3">
                 <Map className="w-10 h-10 text-purple-400" />
-                Quest Map
+                C Programming Quest Map
               </h1>
               <p className="text-xl text-gray-300">
-                Choose your adventure and start coding!
+                Embark on a coding adventure in C-Land with Captain Code!
               </p>
             </div>
             <div className="flex items-center gap-4">
               <div className="bg-white/10 backdrop-blur-sm rounded-2xl px-6 py-4 border border-white/20">
                 <div className="flex items-center gap-2">
                   <Crown className="w-5 h-5 text-yellow-400" />
-                  <span className="font-semibold">Quest Master</span>
+                  <span className="font-semibold">Code Master</span>
                 </div>
               </div>
             </div>
@@ -237,16 +314,15 @@ const QuestMap = ({ onQuestSelect }) => {
                 >
                   <div className="space-y-3">
                     <div className="flex items-center gap-2 text-sm">
-                      <Target className="w-4 h-4 text-purple-400" />
-                      <span>Learn core programming concepts</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-sm">
                       <Code className="w-4 h-4 text-cyan-400" />
-                      <span>Build interactive projects</span>
+                      <span>Code Example:</span>
                     </div>
+                    <pre className="bg-gray-800 p-3 rounded-md text-sm overflow-x-auto">
+                      <code>{quest.code}</code>
+                    </pre>
                     <div className="flex items-center gap-2 text-sm">
                       <Brain className="w-4 h-4 text-pink-400" />
-                      <span>Solve challenging puzzles</span>
+                      <span>Lesson: {quest.lesson}</span>
                     </div>
                   </div>
                 </motion.div>
@@ -306,8 +382,7 @@ const QuestMap = ({ onQuestSelect }) => {
             <div>
               <h3 className="text-xl font-semibold mb-2">AI Mentor Tip</h3>
               <p className="text-gray-300">
-                "Great work on Space Rescue Mission! 🚀 You're mastering conditional logic. 
-                Ready to dive into the Underwater Adventure to learn about arrays and data structures?"
+                "Great work on The Talking Screen! 🗣️ You're mastering printf. Ready to organize Captain Code’s treasures with variables in the next quest?"
               </p>
             </div>
           </div>
