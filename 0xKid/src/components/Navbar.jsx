@@ -35,14 +35,14 @@ const Navbar = () => {
   const navItems = [
   { path: '/dashboard', icon: Home, label: 'Dashboard' },
   { path: '/quests', icon: Map, label: 'Quests' },
-  { path: '/ai-teaching', icon: Brain, label: 'AI Teaching' },
+  { path: '/ai-teaching', icon: Brain, label: 'AI' },
   { path: '/projects', icon: Code, label: 'Projects' },
-  { path: '/game-studio', icon: Gamepad2, label: 'Game Studio' },
-  { path: '/collaboration', icon: Users, label: 'Collaborate' },
+  { path: '/game-studio', icon: Gamepad2, label: 'Games' },
+//   { path: '/collaboration', icon: Users, label: 'Collaborate' },
 //   { path: '/community', icon: Globe, label: 'Community' },
-  { path: '/mindfulness', icon: Heart, label: 'Mindfulness' },
-  { path: '/parent-dashboard', icon: BarChart3, label: 'Parent View' },
-  { path: '/code-editor', icon: Code, label: 'Code Editor' }
+//   { path: '/mindfulness', icon: Heart, label: 'Mindfulness' },
+  { path: '/parent-dashboard', icon: BarChart3, label: 'Parents' },
+  { path: '/code-editor', icon: Code, label: 'Editor' }
 ];
 
 const isActive = (path) => location.pathname === path;
@@ -72,10 +72,10 @@ const isActive = (path) => location.pathname === path;
                   <Link
                     key={item.path}
                     to={item.path}
-                    className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-all duration-300 text-sm ${
+                    className={`flex items-center  gap-2 px-3 py-2 rounded-lg transition-all duration-300 text-sm ${
                       isActive(item.path)
-                        ? 'bg-white/20 text-white shadow-lg'
-                        : 'text-gray-300 hover:text-white hover:bg-white/10'
+                        ? 'bg-white text-white hover:bg-white'
+                        : 'text-red-400 hover:text-white hover:bg-white'
                     }`}
                   >
                     <item.icon className="w-4 h-4" />

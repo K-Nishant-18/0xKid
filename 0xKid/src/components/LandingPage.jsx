@@ -66,7 +66,7 @@ const testimonials = [
   {
     name: "Marcus, 17",
     avatar: "👨‍💻",
-    quote: "CodeVerse helped me build a portfolio that got me into my dream computer science program. The real-world projects are incredible!",
+    quote: "0xKid helped me build a portfolio that got me into my dream computer science program. The real-world projects are incredible!",
     achievement: "College Ready"
   }
 ];
@@ -190,7 +190,7 @@ const LandingPage = () => {
           <div className="flex items-center gap-2 z-50">
             <Sparkles className="w-8 h-8 text-yellow-400" />
             <span className="text-2xl font-bold bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">
-              CodeVerse
+              0xKid
             </span>
           </div>
 
@@ -302,7 +302,7 @@ const LandingPage = () => {
             <div className="flex items-center justify-center gap-3 mb-6 flex-wrap">
               <Sparkles className="w-8 h-8 md:w-12 md:h-12 text-yellow-400" />
               <h1 className="text-5xl sm:text-6xl md:text-8xl font-bold bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
-                CodeVerse
+                0xKid
               </h1>
               <Code className="w-8 h-8 md:w-12 md:h-12 text-cyan-400" />
             </div>
@@ -519,7 +519,7 @@ const LandingPage = () => {
               Ready to Start Your Coding Journey?
             </h2>
             <p className="text-lg md:text-xl text-gray-300 mb-6 md:mb-8">
-              Join CodeVerse today and unlock your potential with AI-powered learning adventures.
+              Join 0xKid today and unlock your potential with AI-powered learning adventures.
             </p>
             <div className="flex flex-col sm:flex-row gap-3 md:gap-4 justify-center">
               <button
@@ -548,7 +548,7 @@ const LandingPage = () => {
             <div>
               <div className="flex items-center gap-2 mb-3 md:mb-4">
                 <Sparkles className="w-5 h-5 md:w-6 md:h-6 text-yellow-400" />
-                <span className="text-lg md:text-xl font-bold">CodeVerse</span>
+                <span className="text-lg md:text-xl font-bold">0xKid</span>
               </div>
               <p className="text-gray-400 text-xs md:text-sm">
                 Empowering the next generation of creators through AI-powered coding education.
@@ -583,7 +583,7 @@ const LandingPage = () => {
             </div>
           </div>
           <div className="border-t border-white/10 mt-8 pt-8 text-center text-gray-400 text-xs md:text-sm">
-            <p>&copy; {new Date().getFullYear()} CodeVerse. All rights reserved. Made with ❤️ for young coders everywhere.</p>
+            <p>&copy; {new Date().getFullYear()} 0xKid. All rights reserved. Made with ❤️ for young coders everywhere.</p>
           </div>
         </div>
       </footer>
