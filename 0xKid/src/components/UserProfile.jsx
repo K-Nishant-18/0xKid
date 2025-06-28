@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { 
   User, 
@@ -16,19 +16,35 @@ import {
   Save,
   LogOut,
   Edit3,
-  Camera
+  Camera,
+  Pin,
+  CheckCircle
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import GamifiedLevel from './GamifiedLevel'; // Assume this is in a separate file
+import Map from './Map'; // New Map component
+
+// Define levels outside components to share across GamifiedLevel and Map
+const levels = [
+  { threshold: 0, name: 'Level 1: Novice', reward: 'Welcome to 0xKid!', area: 'Novice Forest' },
+  { threshold: 20, name: 'Level 2: Apprentice', reward: 'Earned Bronze Badge!', area: 'Apprentice Village' },
+  { threshold: 40, name: 'Level 3: Journeyman', reward: 'Earned Silver Badge!', area: 'Journeyman Castle' },
+  { threshold: 60, name: 'Level 4: Expert', reward: 'Earned Platinum Badge!', area: 'Expert Kingdom' },
+  { threshold: 80, name: 'Level 5: Master', reward: 'Earned Gold Badge! Course Complete!', area: 'Master Citadel' },
+];
 
 const UserProfile = ({ isOpen, onClose }) => {
   const { user, updateUser, logout } = useAuth();
   const [activeTab, setActiveTab] = useState('profile');
   const [isEditing, setIsEditing] = useState(false);
   const [editData, setEditData] = useState({
-    name: user?.name || 'Nishant',
+    name: user?.name || '',
     avatar: user?.avatar || '🧑‍💻',
     language: user?.language || 'English'
   });
+  const [progress, setProgress] = useState(0);
+  const [level, setLevel] = useState(1);
+  const [message, setMessage] = useState('Start your coding adventure!');
 
   const avatarOptions = ['🧑‍💻', '👩‍💻', '👨‍💻', '🧒', '👧', '👦', '🤓', '😎', '🚀', '🎮', '🎨', '🎵'];
   const languageOptions = ['English', 'Spanish', 'French', 'German', 'Hindi', 'Mandarin', 'Japanese'];
@@ -43,6 +59,32 @@ const UserProfile = ({ isOpen, onClose }) => {
   const handleLogout = () => {
     logout();
     onClose();
+  };
+
+  useEffect(() => {
+    if (user) {
+      const maxXP = 500; // Adjust based on your XP system
+      const calculatedProgress = Math.min((user.xp / maxXP) * 100, 100);
+      setProgress(calculatedProgress);
+      const newLevel = Math.min(Math.floor(calculatedProgress / 20) + 1, 5);
+      setLevel(newLevel);
+      setMessage(levels[newLevel - 1].reward);
+    }
+  }, [user]);
+
+  const advanceProgress = () => {
+    let newProgress = progress + 10;
+    if (newProgress > 100) newProgress = 100;
+    setProgress(newProgress);
+    const newLevel = Math.min(Math.floor(newProgress / 20) + 1, 5);
+    if (newLevel !== level) {
+      setLevel(newLevel);
+      setMessage(levels[newLevel - 1].reward);
+    } else if (newProgress === 100) {
+      setMessage(levels[4].reward);
+    } else {
+      setMessage(`Keep going! You're at ${newProgress}%`);
+    }
   };
 
   if (!isOpen || !user) return null;
@@ -72,7 +114,8 @@ const UserProfile = ({ isOpen, onClose }) => {
                 { id: 'preferences', label: 'Preferences', icon: Settings },
                 { id: 'achievements', label: 'Achievements', icon: Trophy },
                 { id: 'privacy', label: 'Privacy & Safety', icon: Shield },
-                { id: 'notifications', label: 'Notifications', icon: Bell }
+                { id: 'notifications', label: 'Notifications', icon: Bell },
+                { id: 'map', label: 'Map', icon: Pin }
               ].map((tab) => (
                 <button
                   key={tab.id}
@@ -109,6 +152,7 @@ const UserProfile = ({ isOpen, onClose }) => {
                 {activeTab === 'achievements' && 'Achievements'}
                 {activeTab === 'privacy' && 'Privacy & Safety'}
                 {activeTab === 'notifications' && 'Notifications'}
+                {activeTab === 'map' && 'Map'}
               </h2>
               <button
                 onClick={onClose}
@@ -185,7 +229,9 @@ const UserProfile = ({ isOpen, onClose }) => {
                           className="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-3 text-white"
                         >
                           {languageOptions.map((lang) => (
-                            <option key={lang} value={lang} className="bg-gray-800">{lang}</option>
+                            <option key={lang} value={lang} className="bg-gray-800 text-white">
+                              {lang}
+                            </option>
                           ))}
                         </select>
                       ) : (
@@ -326,6 +372,7 @@ const UserProfile = ({ isOpen, onClose }) => {
                     </div>
                   ))}
                 </div>
+                <GamifiedLevel progress={progress} setProgress={setProgress} level={level} setLevel={setLevel} setMessage={setMessage} advanceProgress={advanceProgress} />
               </div>
             )}
 
@@ -405,6 +452,16 @@ const UserProfile = ({ isOpen, onClose }) => {
                       </button>
                     </div>
                   </div>
+                </div>
+              </div>
+            )}
+
+            {/* Map Tab */}
+            {activeTab === 'map' && (
+              <div className="space-y-6">
+                <div className="bg-white/10 rounded-2xl p-6">
+                  <h3 className="text-xl font-semibold text-white mb-4">Learning Map</h3>
+                  <Map progress={progress} advanceProgress={advanceProgress} />
                 </div>
               </div>
             )}
