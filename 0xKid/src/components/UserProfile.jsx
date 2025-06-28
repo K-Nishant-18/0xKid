@@ -1,0 +1,418 @@
+import React, { useState } from 'react';
+import { motion } from 'framer-motion';
+import { 
+  User, 
+  Settings, 
+  Star, 
+  Trophy, 
+  Calendar, 
+  Globe,
+  Shield,
+  Bell,
+  Palette,
+  Volume2,
+  Moon,
+  Sun,
+  Save,
+  LogOut,
+  Edit3,
+  Camera
+} from 'lucide-react';
+import { useAuth } from '../contexts/AuthContext';
+
+const UserProfile = ({ isOpen, onClose }) => {
+  const { user, updateUser, logout } = useAuth();
+  const [activeTab, setActiveTab] = useState('profile');
+  const [isEditing, setIsEditing] = useState(false);
+  const [editData, setEditData] = useState({
+    name: user?.name || 'Nishant',
+    avatar: user?.avatar || '🧑‍💻',
+    language: user?.language || 'English'
+  });
+
+  const avatarOptions = ['🧑‍💻', '👩‍💻', '👨‍💻', '🧒', '👧', '👦', '🤓', '😎', '🚀', '🎮', '🎨', '🎵'];
+  const languageOptions = ['English', 'Spanish', 'French', 'German', 'Hindi', 'Mandarin', 'Japanese'];
+
+  const handleSave = () => {
+    if (user) {
+      updateUser(editData);
+      setIsEditing(false);
+    }
+  };
+
+  const handleLogout = () => {
+    logout();
+    onClose();
+  };
+
+  if (!isOpen || !user) return null;
+
+  return (
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+      <motion.div
+        initial={{ opacity: 0, scale: 0.9, y: 20 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.9, y: 20 }}
+        className="bg-gradient-to-br from-purple-900/90 to-blue-900/90 backdrop-blur-md rounded-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden border border-white/20 shadow-2xl"
+      >
+        <div className="flex h-full">
+          {/* Sidebar */}
+          <div className="w-64 bg-white/10 border-r border-white/20 p-6">
+            <div className="flex items-center gap-3 mb-8">
+              <div className="text-3xl">{user.avatar}</div>
+              <div>
+                <h3 className="font-bold text-white">{user.name}</h3>
+                <p className="text-sm text-gray-300">Level {user.level}</p>
+              </div>
+            </div>
+
+            <nav className="space-y-2">
+              {[
+                { id: 'profile', label: 'Profile', icon: User },
+                { id: 'preferences', label: 'Preferences', icon: Settings },
+                { id: 'achievements', label: 'Achievements', icon: Trophy },
+                { id: 'privacy', label: 'Privacy & Safety', icon: Shield },
+                { id: 'notifications', label: 'Notifications', icon: Bell }
+              ].map((tab) => (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
+                    activeTab === tab.id
+                      ? 'bg-white/20 text-white'
+                      : 'text-gray-300 hover:bg-white/10 hover:text-white'
+                  }`}
+                >
+                  <tab.icon className="w-5 h-5" />
+                  {tab.label}
+                </button>
+              ))}
+            </nav>
+
+            <div className="mt-8 pt-6 border-t border-white/20">
+              <button
+                onClick={handleLogout}
+                className="w-full flex items-center gap-3 px-4 py-3 text-red-400 hover:bg-red-500/20 rounded-lg transition-all"
+              >
+                <LogOut className="w-5 h-5" />
+                Sign Out
+              </button>
+            </div>
+          </div>
+
+          {/* Main Content */}
+          <div className="flex-1 p-6 overflow-y-auto">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-bold text-white">
+                {activeTab === 'profile' && 'Profile Settings'}
+                {activeTab === 'preferences' && 'Preferences'}
+                {activeTab === 'achievements' && 'Achievements'}
+                {activeTab === 'privacy' && 'Privacy & Safety'}
+                {activeTab === 'notifications' && 'Notifications'}
+              </h2>
+              <button
+                onClick={onClose}
+                className="p-2 text-gray-400 hover:text-white hover:bg-white/10 rounded-lg transition-colors"
+              >
+                ×
+              </button>
+            </div>
+
+            {/* Profile Tab */}
+            {activeTab === 'profile' && (
+              <div className="space-y-6">
+                <div className="bg-white/10 rounded-2xl p-6">
+                  <div className="flex items-center justify-between mb-6">
+                    <h3 className="text-xl font-semibold text-white">Basic Information</h3>
+                    <button
+                      onClick={() => setIsEditing(!isEditing)}
+                      className="flex items-center gap-2 px-4 py-2 bg-purple-600 hover:bg-purple-700 rounded-lg transition-colors"
+                    >
+                      <Edit3 className="w-4 h-4" />
+                      {isEditing ? 'Cancel' : 'Edit'}
+                    </button>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-300 mb-2">Name</label>
+                      {isEditing ? (
+                        <input
+                          type="text"
+                          value={editData.name}
+                          onChange={(e) => setEditData({ ...editData, name: e.target.value })}
+                          className="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-3 text-white"
+                        />
+                      ) : (
+                        <div className="bg-white/5 rounded-lg px-4 py-3 text-white">{user.name}</div>
+                      )}
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-300 mb-2">Age</label>
+                      <div className="bg-white/5 rounded-lg px-4 py-3 text-white">{user.age} years old</div>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-300 mb-2">Avatar</label>
+                      {isEditing ? (
+                        <div className="grid grid-cols-6 gap-2">
+                          {avatarOptions.map((avatar) => (
+                            <button
+                              key={avatar}
+                              onClick={() => setEditData({ ...editData, avatar })}
+                              className={`text-2xl p-2 rounded-lg transition-all ${
+                                editData.avatar === avatar
+                                  ? 'bg-purple-500/30 ring-2 ring-purple-400'
+                                  : 'bg-white/10 hover:bg-white/20'
+                              }`}
+                            >
+                              {avatar}
+                            </button>
+                          ))}
+                        </div>
+                      ) : (
+                        <div className="bg-white/5 rounded-lg px-4 py-3 text-2xl">{user.avatar}</div>
+                      )}
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-300 mb-2">Language</label>
+                      {isEditing ? (
+                        <select
+                          value={editData.language}
+                          onChange={(e) => setEditData({ ...editData, language: e.target.value })}
+                          className="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-3 text-white"
+                        >
+                          {languageOptions.map((lang) => (
+                            <option key={lang} value={lang} className="bg-gray-800">{lang}</option>
+                          ))}
+                        </select>
+                      ) : (
+                        <div className="bg-white/5 rounded-lg px-4 py-3 text-white">{user.language}</div>
+                      )}
+                    </div>
+                  </div>
+
+                  {isEditing && (
+                    <div className="flex gap-3 mt-6">
+                      <button
+                        onClick={handleSave}
+                        className="flex items-center gap-2 px-6 py-3 bg-green-600 hover:bg-green-700 rounded-lg transition-colors"
+                      >
+                        <Save className="w-4 h-4" />
+                        Save Changes
+                      </button>
+                    </div>
+                  )}
+                </div>
+
+                {/* Stats */}
+                <div className="bg-white/10 rounded-2xl p-6">
+                  <h3 className="text-xl font-semibold text-white mb-4">Your Stats</h3>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div className="text-center">
+                      <div className="text-2xl font-bold text-purple-400">{user.level}</div>
+                      <div className="text-sm text-gray-300">Level</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-2xl font-bold text-yellow-400">{user.xp.toLocaleString()}</div>
+                      <div className="text-sm text-gray-300">XP Points</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-2xl font-bold text-green-400">{user.streak}</div>
+                      <div className="text-sm text-gray-300">Day Streak</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-2xl font-bold text-cyan-400">12</div>
+                      <div className="text-sm text-gray-300">Quests Done</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Preferences Tab */}
+            {activeTab === 'preferences' && (
+              <div className="space-y-6">
+                <div className="bg-white/10 rounded-2xl p-6">
+                  <h3 className="text-xl font-semibold text-white mb-4">Learning Preferences</h3>
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <div className="font-medium text-white">Voice Guidance</div>
+                        <div className="text-sm text-gray-400">Enable AI voice explanations</div>
+                      </div>
+                      <button className="bg-green-500 w-12 h-6 rounded-full relative">
+                        <div className="w-5 h-5 bg-white rounded-full absolute right-0.5 top-0.5"></div>
+                      </button>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <div className="font-medium text-white">Auto-Save Progress</div>
+                        <div className="text-sm text-gray-400">Automatically save your work</div>
+                      </div>
+                      <button className="bg-green-500 w-12 h-6 rounded-full relative">
+                        <div className="w-5 h-5 bg-white rounded-full absolute right-0.5 top-0.5"></div>
+                      </button>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <div className="font-medium text-white">Hints & Tips</div>
+                        <div className="text-sm text-gray-400">Show helpful hints during challenges</div>
+                      </div>
+                      <button className="bg-green-500 w-12 h-6 rounded-full relative">
+                        <div className="w-5 h-5 bg-white rounded-full absolute right-0.5 top-0.5"></div>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-white/10 rounded-2xl p-6">
+                  <h3 className="text-xl font-semibold text-white mb-4">Accessibility</h3>
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-300 mb-2">Font Size</label>
+                      <select className="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-3 text-white">
+                        <option value="small" className="bg-gray-800">Small</option>
+                        <option value="medium" className="bg-gray-800" selected>Medium</option>
+                        <option value="large" className="bg-gray-800">Large</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-300 mb-2">Theme</label>
+                      <div className="flex gap-3">
+                        <button className="flex items-center gap-2 px-4 py-2 bg-purple-600 rounded-lg">
+                          <Moon className="w-4 h-4" />
+                          Dark
+                        </button>
+                        <button className="flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 rounded-lg transition-colors">
+                          <Sun className="w-4 h-4" />
+                          Light
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Achievements Tab */}
+            {activeTab === 'achievements' && (
+              <div className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {[
+                    { icon: "🏆", title: "First Quest", description: "Completed your first coding quest", earned: true },
+                    { icon: "🔥", title: "Week Streak", description: "Coded for 7 days straight", earned: true },
+                    { icon: "🎯", title: "Bug Hunter", description: "Fixed 10 code bugs", earned: true },
+                    { icon: "🚀", title: "Project Master", description: "Built your first game", earned: false },
+                    { icon: "🧠", title: "AI Collaborator", description: "Used AI mentor 50 times", earned: false },
+                    { icon: "👥", title: "Team Player", description: "Completed a collaborative project", earned: false }
+                  ].map((achievement, index) => (
+                    <div
+                      key={index}
+                      className={`p-4 rounded-lg border ${
+                        achievement.earned
+                          ? 'bg-yellow-500/20 border-yellow-500/30'
+                          : 'bg-white/10 border-white/20 opacity-60'
+                      }`}
+                    >
+                      <div className="text-3xl mb-2">{achievement.icon}</div>
+                      <h4 className="font-semibold text-white mb-1">{achievement.title}</h4>
+                      <p className="text-sm text-gray-300">{achievement.description}</p>
+                      {achievement.earned && (
+                        <div className="mt-2 text-xs text-yellow-400">✓ Earned</div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Privacy Tab */}
+            {activeTab === 'privacy' && (
+              <div className="space-y-6">
+                <div className="bg-white/10 rounded-2xl p-6">
+                  <h3 className="text-xl font-semibold text-white mb-4">Safety Settings</h3>
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <div className="font-medium text-white">Chat Moderation</div>
+                        <div className="text-sm text-gray-400">AI monitors all conversations</div>
+                      </div>
+                      <div className="text-green-400">✓ Active</div>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <div className="font-medium text-white">Content Filter</div>
+                        <div className="text-sm text-gray-400">Blocks inappropriate content</div>
+                      </div>
+                      <div className="text-green-400">✓ Active</div>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <div className="font-medium text-white">Parent Notifications</div>
+                        <div className="text-sm text-gray-400">Parents receive activity updates</div>
+                      </div>
+                      <div className="text-green-400">✓ Enabled</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-white/10 rounded-2xl p-6">
+                  <h3 className="text-xl font-semibold text-white mb-4">Data Privacy</h3>
+                  <div className="space-y-3 text-sm text-gray-300">
+                    <p>• We only collect data necessary for your learning experience</p>
+                    <p>• Your code and projects are private by default</p>
+                    <p>• You can delete your account and data at any time</p>
+                    <p>• We comply with COPPA for users under 13</p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Notifications Tab */}
+            {activeTab === 'notifications' && (
+              <div className="space-y-6">
+                <div className="bg-white/10 rounded-2xl p-6">
+                  <h3 className="text-xl font-semibold text-white mb-4">Notification Preferences</h3>
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <div className="font-medium text-white">Quest Reminders</div>
+                        <div className="text-sm text-gray-400">Daily coding reminders</div>
+                      </div>
+                      <button className="bg-green-500 w-12 h-6 rounded-full relative">
+                        <div className="w-5 h-5 bg-white rounded-full absolute right-0.5 top-0.5"></div>
+                      </button>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <div className="font-medium text-white">Achievement Alerts</div>
+                        <div className="text-sm text-gray-400">When you earn new badges</div>
+                      </div>
+                      <button className="bg-green-500 w-12 h-6 rounded-full relative">
+                        <div className="w-5 h-5 bg-white rounded-full absolute right-0.5 top-0.5"></div>
+                      </button>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <div className="font-medium text-white">Break Reminders</div>
+                        <div className="text-sm text-gray-400">Mindfulness break notifications</div>
+                      </div>
+                      <button className="bg-green-500 w-12 h-6 rounded-full relative">
+                        <div className="w-5 h-5 bg-white rounded-full absolute right-0.5 top-0.5"></div>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </motion.div>
+    </div>
+  );
+};
+
+export default UserProfile;
