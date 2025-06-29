@@ -20,10 +20,16 @@ import authRouter from "./routes/auth.route.js";
 import userRouter from "./routes//user.router.js";
 import aiRouter from "./routes/ai.route.js"
 
+// API routes - matching frontend axios baseURL
+app.use("/api/v1/auth", authRouter);
+app.use("/api/v1/user", userRouter);
+app.use("/api/v1/ai", aiRouter);
 
-app.use("/api/auth/",authRouter);
-app.use("/api/user",userRouter);
-app.use("/api/ai",aiRouter)
-app.use(errorHandler)
+// Health check endpoint
+app.get("/api/v1/health", (req, res) => {
+  res.json({ status: "OK", message: "Backend is running" });
+});
+
+app.use(errorHandler);
 
 export { app };

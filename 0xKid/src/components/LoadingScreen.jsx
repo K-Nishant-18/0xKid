@@ -1,18 +1,32 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { motion } from 'framer-motion';
-import { Sparkles, Code, Brain, Heart } from 'lucide-react';
+import { Ghost, BookOpen, Brain, Heart } from 'lucide-react';
 
-const LoadingScreen = ({ message = "Loading your coding adventure..." }) => {
+// Gravity Falls themed background
+const mysteryShackImg = 'https://images.unsplash.com/photo-1519681393784-d120267933ba?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=60';
+
+const LoadingScreen = ({ message = "Unraveling your coding mystery..." }) => {
   const icons = [
-    { Icon: Sparkles, color: 'text-yellow-400', delay: 0 },
-    { Icon: Code, color: 'text-cyan-400', delay: 0.2 },
-    { Icon: Brain, color: 'text-purple-400', delay: 0.4 },
-    { Icon: Heart, color: 'text-pink-400', delay: 0.6 }
+    { Icon: Ghost, color: 'text-blue-300', delay: 0 },
+    { Icon: BookOpen, color: 'text-yellow-600', delay: 0.2 },
+    { Icon: Brain, color: 'text-green-400', delay: 0.4 },
+    { Icon: Heart, color: 'text-red-600', delay: 0.6 }
   ];
 
   return (
-    <div className="fixed inset-0 bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 flex items-center justify-center z-50">
+    <div className="fixed inset-0 bg-gradient-to-br from-blue-900 via-gray-800 to-green-900 flex items-center justify-center z-50 font-['Creepster',_cursive]">
+      <style>
+        {`
+          @import url('https://fonts.googleapis.com/css2?family=Creepster&display=swap');
+          body {
+            background-image: url('${mysteryShackImg}');
+            background-size: cover;
+            background-attachment: fixed;
+            background-position: center;
+          }
+        `}
+      </style>
       <div className="text-center">
         {/* Animated Logo */}
         <motion.div
@@ -22,11 +36,11 @@ const LoadingScreen = ({ message = "Loading your coding adventure..." }) => {
           className="mb-8"
         >
           <div className="flex items-center justify-center gap-3 mb-4">
-            <Sparkles className="w-12 h-12 text-yellow-400" />
-            <h1 className="text-5xl font-bold bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
-              0xKid
+            <Ghost className="w-12 h-12 text-blue-300" />
+            <h1 className="text-5xl font-bold bg-gradient-to-r from-blue-300 to-yellow-600 bg-clip-text text-transparent">
+              Mystery Shack Code
             </h1>
-            <Code className="w-12 h-12 text-cyan-400" />
+            <BookOpen className="w-12 h-12 text-yellow-600" />
           </div>
         </motion.div>
 
@@ -61,12 +75,12 @@ const LoadingScreen = ({ message = "Loading your coding adventure..." }) => {
         </motion.p>
 
         {/* Loading Bar */}
-        <div className="w-64 h-2 bg-white/20 rounded-full overflow-hidden mx-auto">
+        <div className="w-64 h-2 bg-gray-800/50 rounded-full overflow-hidden mx-auto">
           <motion.div
             initial={{ width: 0 }}
             animate={{ width: "100%" }}
-            transition={{ duration: 2, ease: "easeInOut" }}
-            className="h-full bg-gradient-to-r from-purple-500 to-pink-500 rounded-full"
+            transition={{ duration: 5, ease: "easeInOut" }}
+            className="h-full bg-gradient-to-r from-blue-600 to-yellow-600 rounded-full"
           />
         </div>
 
@@ -77,7 +91,7 @@ const LoadingScreen = ({ message = "Loading your coding adventure..." }) => {
           transition={{ delay: 1 }}
           className="mt-8 text-sm text-gray-400"
         >
-          <p>💡 Did you know? The first computer program was written by Ada Lovelace in 1843!</p>
+          <p>🔍 Did you know? The first computer cipher was cracked by Ada Lovelace in 1843!</p>
         </motion.div>
       </div>
     </div>
@@ -89,7 +103,7 @@ LoadingScreen.propTypes = {
 };
 
 LoadingScreen.defaultProps = {
-  message: "Loading your coding adventure..."
+  message: "Unraveling your coding mystery..."
 };
 
 export default LoadingScreen;

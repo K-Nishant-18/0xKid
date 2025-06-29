@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { 
-  Code, 
+  BookOpen, 
   Plus, 
   Sparkles, 
-  Gamepad2, 
+  Ghost, 
   Globe, 
   Smartphone,
   Palette,
@@ -19,24 +19,27 @@ import {
   ExternalLink
 } from 'lucide-react';
 
+// Gravity Falls themed background
+const mysteryShackImg = 'https://images.unsplash.com/photo-1519681393784-d120267933ba?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=60';
+
 const ProjectLab = () => {
   const [selectedCategory, setSelectedCategory] = useState('all');
 
   const categories = [
-    { id: 'all', label: 'All Projects', icon: Code },
-    { id: 'games', label: 'Games', icon: Gamepad2 },
-    { id: 'web', label: 'Websites', icon: Globe },
-    { id: 'apps', label: 'Apps', icon: Smartphone },
-    { id: 'art', label: 'Creative', icon: Palette }
+    { id: 'all', label: 'All Mysteries', icon: BookOpen },
+    { id: 'games', label: 'Mystery Games', icon: Ghost },
+    { id: 'web', label: 'Shack Websites', icon: Globe },
+    { id: 'apps', label: 'Mystic Apps', icon: Smartphone },
+    { id: 'art', label: 'Creative Ciphers', icon: Palette }
   ];
 
   const projects = [
     {
       id: 1,
-      title: "Space Invaders Game",
-      description: "A classic arcade game built with JavaScript and HTML5 Canvas",
+      title: "Gnome Invasion Game",
+      description: "A mystical arcade game built with JavaScript and HTML5 Canvas",
       category: 'games',
-      difficulty: 'Intermediate',
+      difficulty: 'Mystery Hunter',
       duration: '2-3 hours',
       xp: 300,
       status: 'completed',
@@ -47,10 +50,10 @@ const ProjectLab = () => {
     },
     {
       id: 2,
-      title: "Personal Portfolio",
-      description: "A responsive portfolio website to showcase your coding projects",
+      title: "Mystery Shack Portfolio",
+      description: "A responsive journal to showcase your supernatural coding projects",
       category: 'web',
-      difficulty: 'Beginner',
+      difficulty: 'New Sleuth',
       duration: '1-2 hours',
       xp: 200,
       status: 'in-progress',
@@ -61,10 +64,10 @@ const ProjectLab = () => {
     },
     {
       id: 3,
-      title: "Weather App",
-      description: "Get real-time weather updates for any city around the world",
+      title: "Mystic Weather App",
+      description: "Get real-time supernatural weather updates for Gravity Falls",
       category: 'apps',
-      difficulty: 'Intermediate',
+      difficulty: 'Mystery Hunter',
       duration: '3-4 hours',
       xp: 350,
       status: 'not-started',
@@ -75,10 +78,10 @@ const ProjectLab = () => {
     },
     {
       id: 4,
-      title: "Animated Logo Creator",
-      description: "Design and animate your own logos with code",
+      title: "Animated Cipher Creator",
+      description: "Design and animate your own mysterious symbols with code",
       category: 'art',
-      difficulty: 'Advanced',
+      difficulty: 'Master Detective',
       duration: '4-5 hours',
       xp: 450,
       status: 'not-started',
@@ -89,10 +92,10 @@ const ProjectLab = () => {
     },
     {
       id: 5,
-      title: "Music Player",
-      description: "Build a sleek music player with playlist functionality",
+      title: "Mabel's Music Player",
+      description: "Build a glittery music player with playlist functionality",
       category: 'apps',
-      difficulty: 'Intermediate',
+      difficulty: 'Mystery Hunter',
       duration: '2-3 hours',
       xp: 320,
       status: 'completed',
@@ -103,10 +106,10 @@ const ProjectLab = () => {
     },
     {
       id: 6,
-      title: "Puzzle Game",
-      description: "A challenging sliding puzzle game with multiple difficulty levels",
+      title: "Cipher Puzzle Game",
+      description: "A challenging puzzle game with multiple cryptic levels",
       category: 'games',
-      difficulty: 'Advanced',
+      difficulty: 'Master Detective',
       duration: '3-4 hours',
       xp: 400,
       status: 'not-started',
@@ -126,7 +129,7 @@ const ProjectLab = () => {
       case 'completed':
         return 'text-green-400 bg-green-500/20';
       case 'in-progress':
-        return 'text-yellow-400 bg-yellow-500/20';
+        return 'text-yellow-300 bg-yellow-600/20';
       default:
         return 'text-gray-400 bg-gray-500/20';
     }
@@ -135,29 +138,41 @@ const ProjectLab = () => {
   const getStatusText = (status) => {
     switch (status) {
       case 'completed':
-        return 'Completed';
+        return 'Mystery Solved';
       case 'in-progress':
-        return 'In Progress';
+        return 'Investigating';
       default:
-        return 'Not Started';
+        return 'New Mystery';
     }
   };
 
   const getDifficultyColor = (difficulty) => {
     switch (difficulty) {
-      case 'Beginner':
+      case 'New Sleuth':
         return 'text-green-400';
-      case 'Intermediate':
-        return 'text-yellow-400';
-      case 'Advanced':
-        return 'text-red-400';
+      case 'Mystery Hunter':
+        return 'text-yellow-300';
+      case 'Master Detective':
+        return 'text-red-600';
       default:
         return 'text-gray-400';
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 text-white p-4">
+    <div className="min-h-screen bg-gradient-to-br from-blue-900 via-gray-800 to-green-900 text-white font-['Creepster',_cursive] p-4">
+      <style>
+        {`
+          @import url('https://fonts.googleapis.com/css2?family=Creepster&display=swap');
+          body {
+            background-image: url('${mysteryShackImg}');
+            background-size: cover;
+            background-attachment: fixed;
+            background-position: center;
+          }
+        `}
+      </style>
+
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <motion.div
@@ -168,17 +183,17 @@ const ProjectLab = () => {
         >
           <div className="flex items-center justify-between flex-wrap gap-4">
             <div>
-              <h1 className="text-4xl font-bold mb-2 flex items-center gap-3">
-                <Code className="w-10 h-10 text-purple-400" />
-                Project Lab
+              <h1 className="text-4xl font-bold mb-2 flex items-center gap-3 text-yellow-200">
+                <BookOpen className="w-10 h-10 text-blue-300" />
+                Mystery Project Lab
               </h1>
               <p className="text-xl text-gray-300">
-                Build amazing projects and bring your ideas to life!
+                Unravel coding mysteries and create supernatural projects!
               </p>
             </div>
-            <button className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 px-6 py-3 rounded-full font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl flex items-center gap-2">
+            <button className="bg-gradient-to-r from-yellow-600 to-red-800 hover:from-yellow-700 hover:to-red-900 px-6 py-3 rounded-full font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl flex items-center gap-2 text-yellow-200">
               <Plus className="w-5 h-5" />
-              New Project
+              New Mystery Project
             </button>
           </div>
         </motion.div>
@@ -197,8 +212,8 @@ const ProjectLab = () => {
                 onClick={() => setSelectedCategory(category.id)}
                 className={`flex items-center gap-2 px-6 py-3 rounded-full font-medium transition-all duration-300 ${
                   selectedCategory === category.id
-                    ? 'bg-white/20 text-white shadow-lg'
-                    : 'bg-white/10 text-gray-300 hover:bg-white/15 hover:text-white'
+                    ? 'bg-gray-800/50 text-yellow-200 shadow-lg border border-yellow-800/50'
+                    : 'bg-gray-800/30 text-gray-300 hover:bg-gray-700/50 hover:text-yellow-200 border border-yellow-800/30'
                 }`}
               >
                 <category.icon className="w-5 h-5" />
@@ -216,7 +231,7 @@ const ProjectLab = () => {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: index * 0.1 }}
-              className="bg-white/10 backdrop-blur-sm rounded-2xl overflow-hidden border border-white/20 hover:bg-white/15 transition-all duration-300 group"
+              className="bg-gray-800/50 backdrop-blur-sm rounded-2xl overflow-hidden border border-yellow-800/50 hover:bg-gray-700/50 transition-all duration-300 group"
             >
               <div className="relative">
                 <img
@@ -237,14 +252,14 @@ const ProjectLab = () => {
               </div>
 
               <div className="p-6">
-                <h3 className="text-xl font-bold mb-2">{project.title}</h3>
+                <h3 className="text-xl font-bold mb-2 text-yellow-200">{project.title}</h3>
                 <p className="text-gray-300 text-sm mb-4">{project.description}</p>
 
                 <div className="flex flex-wrap gap-2 mb-4">
                   {project.technologies.map((tech, techIndex) => (
                     <span 
                       key={techIndex}
-                      className="px-2 py-1 bg-white/10 rounded-full text-xs font-medium"
+                      className="px-2 py-1 bg-gray-700/50 rounded-full text-xs font-medium text-yellow-200"
                     >
                       {tech}
                     </span>
@@ -258,7 +273,7 @@ const ProjectLab = () => {
                       <span>{project.duration}</span>
                     </div>
                     <div className="flex items-center gap-1">
-                      <Star className="w-4 h-4 text-yellow-400" />
+                      <Star className="w-4 h-4 text-yellow-300" />
                       <span>{project.xp} XP</span>
                     </div>
                   </div>
@@ -271,7 +286,7 @@ const ProjectLab = () => {
                       <span>{project.views}</span>
                     </div>
                     <div className="flex items-center gap-1">
-                      <Star className="w-4 h-4" />
+                      <Star className="w-4 h-4 text-yellow-300" />
                       <span>{project.likes}</span>
                     </div>
                   </div>
@@ -282,24 +297,24 @@ const ProjectLab = () => {
                     project.status === 'completed'
                       ? 'bg-green-500/20 text-green-400 hover:bg-green-500/30'
                       : project.status === 'in-progress'
-                      ? 'bg-yellow-500/20 text-yellow-400 hover:bg-yellow-500/30'
-                      : 'bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 transform hover:scale-105'
+                      ? 'bg-yellow-600/20 text-yellow-300 hover:bg-yellow-600/30'
+                      : 'bg-gradient-to-r from-yellow-600 to-red-800 hover:from-yellow-700 hover:to-red-900 transform hover:scale-105'
                   }`}
                 >
                   {project.status === 'completed' ? (
                     <span className="flex items-center justify-center gap-2">
                       <ExternalLink className="w-4 h-4" />
-                      View Project
+                      View Mystery
                     </span>
                   ) : project.status === 'in-progress' ? (
                     <span className="flex items-center justify-center gap-2">
                       <Play className="w-4 h-4" />
-                      Continue Building
+                      Continue Investigation
                     </span>
                   ) : (
                     <span className="flex items-center justify-center gap-2">
                       <Sparkles className="w-4 h-4" />
-                      Start Building
+                      Start Mystery
                     </span>
                   )}
                 </button>
@@ -313,24 +328,24 @@ const ProjectLab = () => {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.5 }}
-          className="mt-12 bg-gradient-to-r from-purple-500/20 to-pink-500/20 backdrop-blur-sm rounded-2xl p-6 border border-purple-500/30"
+          className="mt-12 bg-gradient-to-r from-yellow-600/20 to-red-800/20 backdrop-blur-sm rounded-2xl p-6 border border-yellow-800/30"
         >
           <div className="flex items-center gap-4">
-            <div className="w-16 h-16 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center text-2xl">
-              🤖
+            <div className="w-16 h-16 rounded-full bg-gradient-to-r from-yellow-600 to-red-800 flex items-center justify-center text-2xl">
+              📖
             </div>
             <div className="flex-1">
-              <h3 className="text-xl font-semibold mb-2">AI Project Suggestions</h3>
+              <h3 className="text-xl font-semibold mb-2 text-yellow-200">Grunkle Stan's Mystery Suggestions</h3>
               <p className="text-gray-300 mb-4">
-                "Based on your progress, I suggest building a Calculator App next! 
-                It's perfect for practicing functions and user interfaces. Want me to generate a custom project idea?"
+                "Nice work, kid! How about building a Mystic Calculator next? 
+                It's perfect for cracking numerical ciphers. Want a new mystery idea?"
               </p>
               <div className="flex gap-3">
-                <button className="bg-purple-500/30 hover:bg-purple-500/40 px-4 py-2 rounded-full text-sm font-medium transition-colors">
-                  Generate Idea
+                <button className="bg-yellow-600/30 hover:bg-yellow-600/40 px-4 py-2 rounded-full text-sm font-medium transition-colors text-yellow-200">
+                  Generate Mystery
                 </button>
-                <button className="bg-white/10 hover:bg-white/20 px-4 py-2 rounded-full text-sm font-medium transition-colors">
-                  View Suggestions
+                <button className="bg-gray-800/50 hover:bg-gray-700/50 px-4 py-2 rounded-full text-sm font-medium transition-colors text-yellow-200">
+                  View Clues
                 </button>
               </div>
             </div>

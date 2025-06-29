@@ -13,22 +13,7 @@ import {
   Heart
 } from 'lucide-react';
 
-interface ProgressData {
-  totalXP: number;
-  level: number;
-  streak: number;
-  questsCompleted: number;
-  projectsBuilt: number;
-  skillsLearned: string[];
-  weeklyActivity: { day: string; minutes: number; xp: number }[];
-  achievements: { icon: string; title: string; date: string }[];
-}
-
-interface ProgressTrackerProps {
-  data: ProgressData;
-}
-
-const ProgressTracker: React.FC<ProgressTrackerProps> = ({ data }) => {
+const ProgressTracker = ({ data }) => {
   const skillCategories = [
     { name: 'Problem Solving', progress: 85, color: 'bg-purple-500' },
     { name: 'Logical Thinking', progress: 78, color: 'bg-blue-500' },
@@ -98,7 +83,7 @@ const ProgressTracker: React.FC<ProgressTrackerProps> = ({ data }) => {
         </h3>
         
         <div className="space-y-3">
-          {data.weeklyActivity.map((day, index) => (
+          {data.weeklyActivity.map((day) => (
             <div key={day.day} className="flex items-center gap-4">
               <div className="w-12 text-sm font-medium">{day.day}</div>
               <div className="flex-1">

@@ -19,6 +19,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import AuthProvider from './contexts/AuthContext';
 import AboutUs from './components/AboutUs';
 import CodeEditor from './components/CodeEditor';
+import ConnectionTest from './components/ConnectionTest';
 
 
 function AppContent() {
@@ -34,7 +35,12 @@ function AppContent() {
     <BrowserRouter>
       <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900">
         <Routes>
-          <Route path="/" element={<LandingPage />} />
+          <Route path="/" element={
+            <div>
+              <LandingPage />
+              <ConnectionTest />
+            </div>
+          } />
           <Route path="/code-editor" element={<CodeEditor/>}/>
           <Route path="/about" element={<AboutUs />} />
           

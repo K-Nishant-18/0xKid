@@ -1,465 +1,527 @@
 import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { AnimatePresence } from 'framer-motion';
 import { 
-  BookOpen,
-  Code,
-  CheckCircle,
-  Play,
-  Lock,
-  ArrowLeft,
-  Zap,
-  Star,
+  BookOpen, 
+  CheckCircle, 
+  Play, 
+  Rocket, 
+  Star, 
+  Code, 
+  Brain, 
+  ArrowLeft, 
+  Sparkles, 
+  Ghost, 
+  Zap, 
+  Save, 
+  HelpCircle, 
+  MessageSquare, 
   Trophy,
-  Brain,
-  MessageSquare,
-  ChevronDown,
-  ChevronUp
+  RotateCcw
 } from 'lucide-react';
-import GameStudio from './GameStudio';
+import { useNavigate } from 'react-router-dom';
+import PropTypes from 'prop-types';
 
-const QuestDetail = ({ quest, onBackToQuests, onQuestComplete }) => {
-  const [activeTab, setActiveTab] = useState('lesson');
-  const [showGameStudio, setShowGameStudio] = useState(false);
-  const [completedChapters, setCompletedChapters] = useState(quest.completedChapters);
-  const [expandedSections, setExpandedSections] = useState({});
+// Gravity Falls themed background
+const mysteryShackImg = 'https://images.unsplash.com/photo-1519681393784-d120267933ba?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=60';
 
-  const toggleSection = (sectionId) => {
-    setExpandedSections(prev => ({
-      ...prev,
-      [sectionId]: !prev[sectionId]
-    }));
-  };
+const QuestDetail = ({ questId, onBack }) => {
+  const navigate = useNavigate();
+  const [codeInput, setCodeInput] = useState('');
+  const [output, setOutput] = useState('');
+  const [aiSuggestion, setAiSuggestion] = useState('');
+  const [progress, setProgress] = useState(0);
+  const [currentChapterIndex, setCurrentChapterIndex] = useState(0);
+  const [isCompleted, setIsCompleted] = useState(false);
+  const [showHints, setShowHints] = useState(false);
+  const [chatMessages, setChatMessages] = useState([]);
+  const [chatInput, setChatInput] = useState('');
+  const [errorLine, setErrorLine] = useState(null);
 
-  const chapters = [
+  const quests = [
     {
       id: 1,
-      title: "Introduction",
-      content: `Welcome to ${quest.title}! In this quest, you'll learn about ${quest.skills.join(' and ')}.`,
-      codeExample: quest.code,
-      interactive: true
+      title: "The Whispering Scroll",
+      description: "Help Arjun uncover the secrets of a glowing scroll in the Mystery Haveli using printf!",
+      difficulty: "Beginner",
+      xp: 100,
+      icon: "📜",
+      color: "from-blue-600 to-green-600",
+      skills: ["printf", "Output"],
+      story: `
+        In the ancient Mystery Haveli, Arjun discovers a glowing scroll hidden in a dusty trunk. The scroll pulses with energy but remains silent. "If only this scroll could speak its secrets!" Arjun sighs. Your mission is to use the printf function in C to make the scroll reveal its message: "The scroll speaks!". Can you help Arjun awaken the scroll's voice and uncover the first clue to the Haveli's mysteries?
+      `,
+      chapters: [
+        {
+          title: "Chapter 1: Awakening the Scroll",
+          content: `
+            The scroll requires a magical incantation to speak. In C, we use printf to display text on the screen. Try writing:
+            \`\`\`c
+            printf("The scroll speaks!");
+            \`\`\`
+            This command makes the scroll display its message. Ensure you include the semicolon (;) at the end, as it's a crucial part of C's syntax. The scroll's magic depends on precision!
+          `,
+          task: "Write code to make the scroll display 'The scroll speaks!'",
+          solution: `printf("The scroll speaks!");`,
+          hints: [
+            "Use printf to display text.",
+            "Enclose the text in double quotes (\" \").",
+            "Don't forget the semicolon at the end of the statement!"
+          ],
+          testCases: [
+            { input: "", expected: "The scroll speaks!" }
+          ]
+        },
+        {
+          title: "Chapter 2: The Scroll's Greeting",
+          content: `
+            The scroll now wants to greet Arjun personally! Use printf to display a personalized message:
+            \`\`\`c
+            printf("Welcome, Arjun!");
+            \`\`\`
+            This will make the scroll address Arjun directly. Ensure the text is enclosed in quotes and ends with a semicolon.
+          `,
+          task: "Make the scroll display 'Welcome, Arjun!'",
+          solution: `printf("Welcome, Arjun!");`,
+          hints: [
+            "Use printf with the exact text 'Welcome, Arjun!'.",
+            "Check that your quotes are double quotes (\" \").",
+            "The semicolon is essential to complete the command."
+          ],
+          testCases: [
+            { input: "", expected: "Welcome, Arjun!" }
+          ]
+        }
+      ],
+      progress: 50,
+      completedChapters: 1,
+      status: "active"
     },
     {
       id: 2,
-      title: "Deep Dive",
-      content: `Let's explore ${quest.skills[0]} in more detail. ${quest.lesson}`,
-      codeExample: quest.code,
-      interactive: true
-    },
-    {
-      id: 3,
-      title: "Practice Time",
-      content: "Now it's your turn to try it out! Complete the interactive challenge.",
-      codeExample: quest.code,
-      interactive: true
+      title: "Priya's Enchanted Vault",
+      description: "Organize Priya's mystical artifacts in the Mystery Haveli's vault using variables.",
+      difficulty: "Beginner",
+      xp: 150,
+      icon: "🎁",
+      color: "from-yellow-600 to-red-600",
+      skills: ["Variables", "Data Types"],
+      story: `
+        Priya, the keeper of the Mystery Haveli's vault, is overwhelmed! The vault is filled with enchanted artifacts, including 75 mystical gems and a sacred amulet marked 'P'. "I need to organize these treasures!" she exclaims. Your task is to use variables in C to catalog Priya's artifacts. Can you help her bring order to the vault and keep the Haveli's magic intact?
+      `,
+      chapters: [
+        {
+          title: "Chapter 1: Counting the Gems",
+          content: `
+            To organize Priya's 75 mystical gems, you'll use an integer variable. In C, variables store data like numbers. Try this:
+            \`\`\`c
+            int gems = 75;
+            printf("Gems: %d", gems);
+            \`\`\`
+            The int type is for whole numbers, and %d in printf displays the number stored in gems. Make sure to declare the variable and print it correctly.
+          `,
+          task: "Create an integer variable to store 75 gems and display it.",
+          solution: `int gems = 75;\nprintf("Gems: %d", gems);`,
+          hints: [
+            "Use int for whole numbers like 75.",
+            "Assign the value with =.",
+            "Use %d in printf to display the number."
+          ],
+          testCases: [
+            { input: "", expected: "Gems: 75" }
+          ]
+        },
+        {
+          title: "Chapter 2: The Sacred Amulet",
+          content: `
+            Now, Priya needs to catalog a sacred amulet marked with the letter 'P'. Use a character variable:
+            \`\`\`c
+            char amulet = 'P';
+            printf("Amulet: %c", amulet);
+            \`\`\`
+            The char type stores single characters in single quotes (' '), and %c in printf displays the character. Ensure proper syntax!
+          `,
+          task: "Create a char variable for the amulet 'P' and display it.",
+          solution: `char amulet = 'P';\nprintf("Amulet: %c", amulet);`,
+          hints: [
+            "Use char for single letters like 'P'.",
+            "Enclose the letter in single quotes (' ').",
+            "Use %c in printf to show the character."
+          ],
+          testCases: [
+            { input: "", expected: "Amulet: P" }
+          ]
+        },
+        {
+          title: "Chapter 3: Combining the Artifacts",
+          content: `
+            Priya wants to display both the gems and the amulet together. Combine the variables in one printf statement:
+            \`\`\`c
+            int gems = 75;
+            char amulet = 'P';
+            printf("Vault: %d gems, Amulet %c", gems, amulet);
+            \`\`\`
+            This shows both values in a single message. Use %d for the integer and %c for the character.
+          `,
+          task: "Display both 75 gems and amulet 'P' in one printf statement.",
+          solution: `int gems = 75;\nchar amulet = 'P';\nprintf("Vault: %d gems, Amulet %c", gems, amulet);`,
+          hints: [
+            "Declare both variables before printing.",
+            "Use %d for gems and %c for amulet in the same printf.",
+            "Separate format specifiers with a comma in printf."
+          ],
+          testCases: [
+            { input: "", expected: "Vault: 75 gems, Amulet P" }
+          ]
+        }
+      ],
+      progress: 33,
+      completedChapters: 1,
+      status: "active"
     }
   ];
 
-  const handleChapterComplete = (chapterId) => {
-    if (!completedChapters.includes(chapterId)) {
-      setCompletedChapters([...completedChapters, chapterId]);
-    }
-    
-    if (chapterId === quest.chapters) {
-      onQuestComplete(quest.id);
+  const quest = quests.find(q => q.id === questId) || quests[0];
+  const currentChapter = quest.chapters[currentChapterIndex];
+
+  useEffect(() => {
+    setProgress(quest.progress);
+    setCurrentChapterIndex(quest.completedChapters);
+  }, [questId]);
+
+  const validateCode = (input, solution) => {
+    const normalizedInput = input.trim().replace(/\s+/g, ' ');
+    const normalizedSolution = solution.trim().replace(/\s+/g, ' ');
+    return normalizedInput === normalizedSolution;
+  };
+
+  const handleCodeSubmit = () => {
+    if (validateCode(codeInput, currentChapter.solution)) {
+      setOutput(currentChapter.testCases[0].expected);
+      setIsCompleted(true);
+      setProgress(prev => Math.min(prev + (100 / quest.chapters.length), 100));
+      setAiSuggestion(`Amazing work, young detective! You've solved this chapter. ${currentChapterIndex + 1 < quest.chapters.length ? 'Ready for the next chapter?' : 'You\'ve completed the quest!'}`);
+      if (currentChapterIndex + 1 < quest.chapters.length) {
+        setTimeout(() => {
+          setCurrentChapterIndex(prev => prev + 1);
+          setIsCompleted(false);
+          setCodeInput('');
+          setOutput('');
+          setAiSuggestion('');
+        }, 2000);
+      }
+    } else {
+      const errors = [
+        "Hmm, the scroll's magic isn't responding. Check for typos in your code!",
+        "Something's off in the syntax. Did you include the semicolon?",
+        "The output doesn't match the mystery. Try again with the correct format!"
+      ];
+      setOutput(errors[Math.floor(Math.random() * errors.length)]);
+      setAiSuggestion(currentChapter.hints[Math.floor(Math.random() * currentChapter.hints.length)]);
+      setErrorLine(Math.floor(Math.random() * codeInput.split('\n').length) + 1);
     }
   };
 
-  const progress = Math.round((completedChapters.length / quest.chapters) * 100);
+  const handleSaveProgress = () => {
+    // Simulate saving progress
+    alert(`Progress saved for ${quest.title}!`);
+  };
+
+  const handleResetCode = () => {
+    setCodeInput('');
+    setOutput('');
+    setAiSuggestion('Code reset! Start fresh and unravel the mystery.');
+    setErrorLine(null);
+  };
+
+  const handlePreviousChapter = () => {
+    if (currentChapterIndex > 0) {
+      setCurrentChapterIndex(prev => prev - 1);
+      setIsCompleted(false);
+      setCodeInput('');
+      setOutput('');
+      setAiSuggestion('Welcome back to the previous chapter! Continue your journey.');
+      setErrorLine(null);
+      setProgress(prev => Math.max(prev - (100 / quest.chapters.length), 0));
+    }
+  };
+
+  const handleShowHints = () => {
+    setShowHints(!showHints);
+    if (!showHints) {
+      setAiSuggestion("Here are some clues to guide you through the mystery!");
+    }
+  };
+
+  const handleChatSubmit = () => {
+    if (chatInput.trim()) {
+      setChatMessages([...chatMessages, { user: true, text: chatInput }]);
+      // Simulate AI response
+      const aiResponses = [
+        "Great question! Can you clarify what part of the code is puzzling you?",
+        "Let's break it down. Try focusing on the printf syntax first!",
+        "I'm here to help! Could you share what output you're seeing?"
+      ];
+      setTimeout(() => {
+        setChatMessages(prev => [...prev, { user: false, text: aiResponses[Math.floor(Math.random() * aiResponses.length)] }]);
+      }, 1000);
+      setChatInput('');
+    }
+  };
+
+  const handleBackToMap = () => {
+    if (onBack) {
+      onBack();
+    } else {
+      navigate('/quests');
+    }
+  };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 text-white p-4">
-      {showGameStudio ? (
-        <GameStudio 
-          activeQuest={quest} 
-          onBackToQuests={() => setShowGameStudio(false)}
-          onQuestComplete={() => {
-            setShowGameStudio(false);
-            onQuestComplete(quest.id);
-          }}
-        />
-      ) : (
-        <div className="max-w-5xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="mb-8"
+    <div className="min-h-screen bg-gradient-to-br from-blue-900 via-gray-800 to-green-900 text-white p-4 sm:p-6 font-['Creepster',_cursive]">
+      <style>
+        {`
+          @import url('https://fonts.googleapis.com/css2?family=Creepster&display=swap');
+          body {
+            background-image: url('${mysteryShackImg}');
+            background-size: cover;
+            background-attachment: fixed;
+            background-position: center;
+          }
+        `}
+      </style>
+      <div className="max-w-6xl mx-auto">
+        {/* Header */}
+        <div
+          className="mb-8"
+        >
+          <button
+            onClick={handleBackToMap}
+            className="flex items-center gap-2 text-yellow-200 hover:text-yellow-300 mb-4 transition-colors"
           >
-            <div className="flex items-center justify-between flex-wrap gap-4">
-              <div>
-                <button
-                  onClick={onBackToQuests}
-                  className="flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 rounded-lg transition-colors mb-4"
-                >
-                  <ArrowLeft className="w-4 h-4" />
-                  Back to Quests
-                </button>
-                <h1 className="text-4xl font-bold mb-2 flex items-center gap-3">
-                  <span className="text-4xl">{quest.icon}</span>
-                  {quest.title}
-                </h1>
-                <p className="text-xl text-gray-300">{quest.description}</p>
+            <ArrowLeft className="w-6 h-6" />
+            Back to Mystery Map
+          </button>
+          <div className="flex items-center justify-between flex-wrap gap-4">
+            <div>
+              <h1 className="text-3xl sm:text-4xl font-bold mb-2 flex items-center gap-3 text-yellow-200">
+                <BookOpen className="w-8 h-8 sm:w-10 sm:h-10 text-blue-300" />
+                {quest.title}
+              </h1>
+              <p className="text-lg sm:text-xl text-gray-300">{quest.description}</p>
+            </div>
+            <div className="flex items-center gap-4">
+              <div className="bg-gray-800/50 backdrop-blur-sm rounded-2xl px-4 sm:px-6 py-3 sm:py-4 border border-yellow-800/50">
+                <div className="flex items-center gap-2">
+                  <Star className="w-5 h-5 text-yellow-600" />
+                  <span className="font-semibold text-yellow-200">{quest.xp} XP</span>
+                </div>
               </div>
-              <div className="flex items-center gap-4">
-                <div className="bg-white/10 backdrop-blur-sm rounded-2xl px-6 py-4 border border-white/20">
-                  <div className="flex items-center gap-2">
-                    <Star className="w-5 h-5 text-yellow-400" />
-                    <span className="font-semibold">{quest.xp} XP</span>
-                  </div>
+              <div className="bg-gray-800/50 backdrop-blur-sm rounded-2xl px-4 sm:px-6 py-3 sm:py-4 border border-yellow-800/50">
+                <div className="flex items-center gap-2">
+                  <Trophy className="w-5 h-5 text-blue-300" />
+                  <span className="font-semibold text-yellow-200">{quest.difficulty}</span>
                 </div>
               </div>
             </div>
-          </motion.div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-            <motion.div
-              initial={{ opacity: 0, x: -30 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.8, delay: 0.2 }}
-              className="lg:col-span-3 space-y-6"
-            >
-              <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
-                <div className="flex items-center justify-between mb-6">
-                  <div>
-                    <h2 className="text-2xl font-bold mb-1">Quest Progress</h2>
-                    <div className="flex items-center gap-2 text-sm text-gray-300">
-                      <span>{completedChapters.length} of {quest.chapters} chapters completed</span>
-                    </div>
-                  </div>
-                  <div className="relative w-16 h-16">
-                    <svg className="w-full h-full" viewBox="0 0 36 36">
-                      <path
-                        d="M18 2.0845
-                          a 15.9155 15.9155 0 0 1 0 31.831
-                          a 15.9155 15.9155 0 0 1 0 -31.831"
-                        fill="none"
-                        stroke="#333"
-                        strokeWidth="3"
-                      />
-                      <path
-                        d="M18 2.0845
-                          a 15.9155 15.9155 0 0 1 0 31.831
-                          a 15.9155 15.9155 0 0 1 0 -31.831"
-                        fill="none"
-                        stroke={getQuestColor(quest)}
-                        strokeWidth="3"
-                        strokeDasharray={`${progress}, 100`}
-                      />
-                    </svg>
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <span className="text-sm font-bold">{progress}%</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="w-full bg-gray-700 rounded-full h-3 mb-2">
-                  <div 
-                    className={`h-3 rounded-full bg-gradient-to-r ${quest.color} transition-all duration-500`}
-                    style={{ width: `${progress}%` }}
-                  ></div>
-                </div>
-              </div>
-
-              <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
-                <div className="flex border-b border-white/10 mb-4">
-                  <button
-                    className={`px-4 py-2 font-medium flex items-center gap-2 ${activeTab === 'lesson' ? 'text-white border-b-2 border-purple-400' : 'text-gray-400'}`}
-                    onClick={() => setActiveTab('lesson')}
-                  >
-                    <BookOpen className="w-4 h-4" />
-                    Lesson
-                  </button>
-                  <button
-                    className={`px-4 py-2 font-medium flex items-center gap-2 ${activeTab === 'code' ? 'text-white border-b-2 border-purple-400' : 'text-gray-400'}`}
-                    onClick={() => setActiveTab('code')}
-                  >
-                    <Code className="w-4 h-4" />
-                    Code
-                  </button>
-                </div>
-
-                {activeTab === 'lesson' && (
-                  <div>
-                    <h3 className="text-xl font-semibold mb-4 flex items-center gap-2">
-                      <Brain className="w-5 h-5 text-pink-400" />
-                      What You'll Learn
-                    </h3>
-                    <div className="bg-black/30 p-4 rounded-lg mb-6">
-                      <p>{quest.lesson}</p>
-                    </div>
-
-                    <div className="space-y-4">
-                      {chapters.map((chapter, index) => (
-                        <div 
-                          key={chapter.id} 
-                          className={`border rounded-xl overflow-hidden transition-all duration-300 ${completedChapters.includes(chapter.id) ? 'border-green-500/30 bg-green-500/10' : 'border-white/10'}`}
-                        >
-                          <div 
-                            className="flex items-center justify-between p-4 cursor-pointer"
-                            onClick={() => toggleSection(chapter.id)}
-                          >
-                            <div className="flex items-center gap-3">
-                              <div className={`w-8 h-8 rounded-full flex items-center justify-center ${completedChapters.includes(chapter.id) ? 'bg-green-500/20 text-green-400' : 'bg-white/10 text-white'}`}>
-                                {completedChapters.includes(chapter.id) ? (
-                                  <CheckCircle className="w-4 h-4" />
-                                ) : (
-                                  <span>{index + 1}</span>
-                                )}
-                              </div>
-                              <h4 className="font-medium">{chapter.title}</h4>
-                            </div>
-                            {expandedSections[chapter.id] ? (
-                              <ChevronUp className="w-5 h-5 text-gray-400" />
-                            ) : (
-                              <ChevronDown className="w-5 h-5 text-gray-400" />
-                            )}
-                          </div>
-                          
-                          {expandedSections[chapter.id] && (
-                            <div className="p-4 pt-0 border-t border-white/10">
-                              <div className="prose prose-invert max-w-none mb-4">
-                                <p>{chapter.content}</p>
-                              </div>
-                              
-                              {chapter.codeExample && (
-                                <div className="mb-4">
-                                  <div className="flex items-center gap-2 text-sm mb-2">
-                                    <Code className="w-4 h-4 text-cyan-400" />
-                                    <span className="font-medium">Code Example:</span>
-                                  </div>
-                                  <pre className="bg-gray-800 p-3 rounded-md text-sm overflow-x-auto">
-                                    <code>{chapter.codeExample}</code>
-                                  </pre>
-                                </div>
-                              )}
-                              
-                              {chapter.interactive && (
-                                <button
-                                  onClick={() => {
-                                    if (!completedChapters.includes(chapter.id)) {
-                                      handleChapterComplete(chapter.id);
-                                    }
-                                    setShowGameStudio(true);
-                                  }}
-                                  className={`w-full mt-4 py-3 rounded-full font-semibold transition-all duration-300 flex items-center justify-center gap-2 ${
-                                    completedChapters.includes(chapter.id)
-                                      ? 'bg-green-500/20 text-green-400 hover:bg-green-500/30'
-                                      : `bg-gradient-to-r ${quest.color} hover:shadow-lg`
-                                  }`}
-                                >
-                                  {completedChapters.includes(chapter.id) ? (
-                                    <>
-                                      <CheckCircle className="w-4 h-4" />
-                                      Practice Again
-                                    </>
-                                  ) : (
-                                    <>
-                                      <Play className="w-4 h-4" />
-                                      Start Interactive Lesson
-                                    </>
-                                  )}
-                                </button>
-                              )}
-                            </div>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {activeTab === 'code' && (
-                  <div>
-                    <h3 className="text-xl font-semibold mb-4 flex items-center gap-2">
-                      <Code className="w-5 h-5 text-cyan-400" />
-                      Code Examples
-                    </h3>
-                    <div className="space-y-6">
-                      <div>
-                        <h4 className="font-medium mb-2">Basic Syntax</h4>
-                        <pre className="bg-gray-800 p-4 rounded-md text-sm overflow-x-auto">
-                          <code>{quest.code}</code>
-                        </pre>
-                      </div>
-                      <div>
-                        <h4 className="font-medium mb-2">Common Patterns</h4>
-                        <pre className="bg-gray-800 p-4 rounded-md text-sm overflow-x-auto">
-                          <code>{getExtendedCodeExample(quest.id)}</code>
-                        </pre>
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, x: 30 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.8, delay: 0.3 }}
-              className="space-y-6"
-            >
-              <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
-                <h3 className="text-xl font-semibold mb-4 flex items-center gap-2">
-                  <Zap className="w-5 h-5 text-yellow-400" />
-                  Skills You'll Gain
-                </h3>
-                <div className="space-y-3">
-                  {quest.skills.map((skill, index) => (
-                    <div key={index} className="flex items-center gap-3 p-3 bg-white/5 rounded-lg">
-                      <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center">
-                        <span className="text-sm">{index + 1}</span>
-                      </div>
-                      <span className="font-medium">{skill}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
-                <h3 className="text-xl font-semibold mb-4 flex items-center gap-2">
-                  <Trophy className="w-5 h-5 text-purple-400" />
-                  Quest Details
-                </h3>
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <span className="text-gray-300">Difficulty</span>
-                    <span className={`font-semibold ${getDifficultyColor(quest.difficulty)}`}>
-                      {quest.difficulty}
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-gray-300">Estimated Time</span>
-                    <span className="font-semibold">{getEstimatedTime(quest.difficulty)}</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-gray-300">Chapters</span>
-                    <span className="font-semibold">{quest.chapters}</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-gray-300">Completed</span>
-                    <span className="font-semibold">{completedChapters.length}</span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
-                <h3 className="text-xl font-semibold mb-4">Actions</h3>
-                <div className="space-y-3">
-                  <button
-                    onClick={() => setShowGameStudio(true)}
-                    className="w-full flex items-center gap-2 justify-center py-3 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 rounded-lg font-medium transition-colors"
-                  >
-                    <Play className="w-4 h-4" />
-                    Start Interactive Lesson
-                  </button>
-                  <button
-                    onClick={() => navigator.clipboard.writeText(quest.code)}
-                    className="w-full flex items-center gap-2 justify-center py-3 bg-blue-500 hover:bg-blue-600 rounded-lg font-medium transition-colors"
-                  >
-                    <Code className="w-4 h-4" />
-                    Copy Code Example
-                  </button>
-                </div>
-              </div>
-            </motion.div>
           </div>
         </div>
-      )}
+
+        {/* Story Section */}
+        <div
+          className="bg-gray-800/50 backdrop-blur-sm rounded-2xl p-6 border border-yellow-800/50 mb-6"
+        >
+          <h2 className="text-xl sm:text-2xl font-semibold mb-4 text-yellow-200 flex items-center gap-2">
+            <Ghost className="w-6 h-6" />
+            The Mystery Unfolds
+          </h2>
+          <p className="text-gray-300 leading-relaxed">{quest.story}</p>
+        </div>
+
+        {/* Chapter Content */}
+        <div
+          className="bg-gray-800/50 backdrop-blur-sm rounded-2xl p-6 border border-yellow-800/50 mb-6"
+        >
+          <h2 className="text-xl sm:text-2xl font-semibold mb-4 text-yellow-200">
+            Chapter {currentChapterIndex + 1}: {currentChapter.title}
+          </h2>
+          <p className="text-gray-300 mb-4">{currentChapter.content}</p>
+          <div className="flex items-center gap-2 mb-4">
+            <Rocket className="w-5 h-5 text-blue-300" />
+            <span className="text-sm font-medium text-yellow-200">Task: {currentChapter.task}</span>
+          </div>
+          <AnimatePresence>
+            {showHints && (
+              <div
+                className="mt-4 p-4 bg-gray-900 rounded-md"
+              >
+                <h3 className="text-lg font-semibold text-yellow-200 flex items-center gap-2">
+                  <HelpCircle className="w-5 h-5" />
+                  Hints
+                </h3>
+                <ul className="list-disc list-inside text-gray-300">
+                  {currentChapter.hints.map((hint, index) => (
+                    <li key={index} className="text-sm">{hint}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </AnimatePresence>
+        </div>
+
+        {/* Code Editor */}
+        <div
+          className="bg-gray-900 rounded-2xl p-6 border border-yellow-800/50 mb-6"
+        >
+          <h2 className="text-xl sm:text-2xl font-semibold mb-4 text-yellow-200 flex items-center gap-2">
+            <Code className="w-6 h-6" />
+            Code Journal
+          </h2>
+          <textarea
+            value={codeInput}
+            onChange={(e) => setCodeInput(e.target.value)}
+            className="w-full h-48 sm:h-64 bg-gray-800 p-4 rounded-md text-white font-mono text-sm resize-none focus:outline-none focus:ring-2 focus:ring-yellow-600"
+            placeholder="Write your code here..."
+          />
+          <div className="flex flex-wrap gap-4 mt-4">
+            <button
+              onClick={handlePreviousChapter}
+              disabled={currentChapterIndex === 0}
+              className={`px-6 py-3 rounded-full font-semibold transition-all duration-300 flex items-center gap-2 ${
+                currentChapterIndex === 0 
+                  ? 'bg-gray-700/30 text-gray-500 cursor-not-allowed' 
+                  : 'bg-gray-800/50 hover:bg-gray-700/50 text-yellow-200'
+              }`}
+            >
+              <ArrowLeft className="w-5 h-5" />
+              Previous Chapter
+            </button>
+            <button
+              onClick={handleCodeSubmit}
+              className="bg-gradient-to-r from-yellow-600 to-red-600 hover:from-yellow-700 hover:to-red-700 px-6 py-3 rounded-full font-semibold transition-all duration-300 flex items-center gap-2 text-yellow-200"
+            >
+              <Play className="w-5 h-5" />
+              Run Code
+            </button>
+            <button
+              onClick={handleSaveProgress}
+              className="bg-gray-800/50 hover:bg-gray-700/50 px-6 py-3 rounded-full font-semibold transition-all duration-300 flex items-center gap-2 text-yellow-200"
+            >
+              <Save className="w-5 h-5" />
+              Save Progress
+            </button>
+            <button
+              onClick={handleResetCode}
+              className="bg-gray-800/50 hover:bg-gray-700/50 px-6 py-3 rounded-full font-semibold transition-all duration-300 flex items-center gap-2 text-yellow-200"
+            >
+              <RotateCcw className="w-5 h-5" />
+              Reset Code
+            </button>
+            <button
+              onClick={handleShowHints}
+              className="bg-gray-800/50 hover:bg-gray-700/50 px-6 py-3 rounded-full font-semibold transition-all duration-300 flex items-center gap-2 text-yellow-200"
+            >
+              <HelpCircle className="w-5 h-5" />
+              {showHints ? 'Hide Hints' : 'Show Hints'}
+            </button>
+          </div>
+          {output && (
+            <div className="mt-4 p-4 bg-gray-800 rounded-md">
+              <h3 className="text-lg font-semibold text-yellow-200">Output:</h3>
+              <p className={`text-${isCompleted ? 'green-400' : 'red-400'}`}>
+                {output}
+                {errorLine && !isCompleted && <span> (Possible error on line {errorLine})</span>}
+              </p>
+            </div>
+          )}
+        </div>
+
+        {/* AI Mentor Chat */}
+        <div
+          className="bg-gray-800/50 backdrop-blur-sm rounded-2xl p-6 border border-yellow-800/50 mb-6"
+        >
+          <h2 className="text-xl sm:text-2xl font-semibold mb-4 text-yellow-200 flex items-center gap-2">
+            <MessageSquare className="w-6 h-6" />
+            AI Mentor Chat
+          </h2>
+          <div className="h-48 sm:h-64 overflow-y-auto bg-gray-900 p-4 rounded-md mb-4">
+            {chatMessages.map((msg, index) => (
+              <div
+                key={index}
+                className={`mb-2 p-2 rounded-md ${
+                  msg.user ? 'bg-blue-600/20 text-blue-300 ml-auto' : 'bg-yellow-600/20 text-yellow-200'
+                }`}
+              >
+                <p className="text-sm">{msg.text}</p>
+              </div>
+            ))}
+          </div>
+          <div className="flex gap-2">
+            <input
+              type="text"
+              value={chatInput}
+              onChange={(e) => setChatInput(e.target.value)}
+              className="flex-1 bg-gray-800 p-3 rounded-md text-white text-sm focus:outline-none focus:ring-2 focus:ring-yellow-600"
+              placeholder="Ask the AI Mentor a question..."
+            />
+            <button
+              onClick={handleChatSubmit}
+              className="bg-gradient-to-r from-yellow-600 to-red-600 hover:from-yellow-700 hover:to-red-700 px-4 py-3 rounded-full font-semibold transition-all duration-300 text-yellow-200"
+            >
+              Send
+            </button>
+          </div>
+        </div>
+
+        {/* AI Mentor Suggestion */}
+        <div
+          className="bg-gradient-to-r from-blue-600/20 to-yellow-600/20 backdrop-blur-sm rounded-2xl p-6 border border-blue-600/30 mb-6"
+        >
+          <div className="flex items-center gap-4">
+            <div className="w-16 h-16 rounded-full bg-gradient-to-r from-blue-600 to-yellow-600 flex items-center justify-center text-2xl">
+              🦁
+            </div>
+            <div>
+              <h3 className="text-xl font-semibold mb-2 text-yellow-200">AI Mentor Tip</h3>
+              <p className="text-gray-300">{aiSuggestion || "Type the code exactly as shown in the example. I'm here to guide you through the mystery!"}</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Progress and Completion */}
+        <div className="mt-6">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-sm text-gray-300">Quest Progress</span>
+            <span className="text-sm font-medium text-yellow-200">{Math.round(progress)}%</span>
+          </div>
+          <div className="w-full bg-gray-700 rounded-full h-2">
+            <div 
+              className={`h-2 rounded-full bg-gradient-to-r ${quest.color} transition-all duration-300`}
+              style={{ width: `${progress}%` }}
+            ></div>
+          </div>
+          <div className="mt-4 text-center text-gray-300">
+            Chapter {currentChapterIndex + 1} of {quest.chapters.length}
+          </div>
+          {isCompleted && (
+            <div
+              className="mt-4 p-4 bg-green-600/20 rounded-md text-center"
+            >
+              <h3 className="text-lg font-semibold text-green-400 flex items-center justify-center gap-2">
+                <CheckCircle className="w-5 h-5" />
+                Chapter Complete!
+              </h3>
+              <p className="text-gray-300">You've earned {Math.round(quest.xp / quest.chapters.length)} XP! {currentChapterIndex + 1 < quest.chapters.length ? 'Ready for the next chapter?' : 'Quest completed!'}</p>
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   );
 };
 
-// Helper functions
-function getQuestColor(quest) {
-  const colorMap = {
-    'from-blue-500 to-cyan-500': '#3B82F6',
-    'from-green-500 to-emerald-500': '#10B981',
-    'from-yellow-500 to-orange-500': '#F59E0B',
-    'from-purple-500 to-pink-500': '#8B5CF6',
-    'from-emerald-500 to-teal-500': '#10B981',
-    'from-red-500 to-pink-500': '#EF4444',
-    'from-indigo-500 to-blue-500': '#6366F1',
-    'from-orange-500 to-red-500': '#F97316',
-    'from-cyan-500 to-blue-500': '#06B6D4',
-    'from-gray-500 to-indigo-500': '#6B7280',
-  };
-  return colorMap[quest.color] || '#3B82F6';
-}
-
-function getDifficultyColor(difficulty) {
-  switch (difficulty) {
-    case 'Beginner':
-      return 'text-green-400';
-    case 'Intermediate':
-      return 'text-yellow-400';
-    case 'Advanced':
-      return 'text-red-400';
-    default:
-      return 'text-gray-400';
-  }
-}
-
-function getEstimatedTime(difficulty) {
-  switch (difficulty) {
-    case 'Beginner':
-      return '15-30 mins';
-    case 'Intermediate':
-      return '30-45 mins';
-    case 'Advanced':
-      return '45-60 mins';
-    default:
-      return '20-40 mins';
-  }
-}
-
-function getExtendedCodeExample(questId) {
-  const examples = {
-    1: `#include <stdio.h>
-
-int main() {
-    // Print a message to the screen
-    printf("Hello, C-Land!\\n");
-    printf("I'm learning C programming!\\n");
-    
-    return 0;
-}`,
-    2: `#include <stdio.h>
-
-int main() {
-    // Declare variables to store different types of data
-    int coins = 50;          // Integer variable
-    float temperature = 23.5; // Floating point variable
-    char grade = 'A';        // Character variable
-    
-    // Print the values
-    printf("I have %d coins\\n", coins);
-    printf("Temperature is %.1f°C\\n", temperature);
-    printf("My grade is %c\\n", grade);
-    
-    return 0;
-}`,
-    3: `#include <stdio.h>
-
-int main() {
-    int a = 10, b = 4;
-    
-    // Basic arithmetic operations
-    printf("%d + %d = %d\\n", a, b, a + b);
-    printf("%d - %d = %d\\n", a, b, a - b);
-    printf("%d * %d = %d\\n", a, b, a * b);
-    printf("%d / %d = %d\\n", a, b, a / b);
-    printf("%d %% %d = %d\\n", a, b, a % b);
-    
-    // Compound assignment
-    a += 5; // Same as a = a + 5
-    printf("a is now %d\\n", a);
-    
-    return 0;
-}`
-  };
-  
-  return examples[questId] || `// No extended example available for this quest`;
-}
+QuestDetail.propTypes = {
+  questId: PropTypes.number.isRequired,
+  onBack: PropTypes.func
+};
 
 export default QuestDetail;

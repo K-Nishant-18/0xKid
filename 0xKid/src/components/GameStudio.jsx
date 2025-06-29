@@ -1,860 +1,702 @@
-import React, { useState, useRef, useEffect } from 'react';
-import PropTypes from 'prop-types';
-import { motion } from 'framer-motion';
-import {
-  Gamepad2,
-  Play,
-  Pause,
-  RotateCcw,
-  Save,
-  Share2,
-  Download,
-  Palette,
-  Star,
-  Trophy,
+import React, { useState, useEffect, useRef } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { 
+  Ghost, 
+  BookOpen, 
+  Star, 
+  Play, 
+  CheckCircle, 
+  ArrowLeft, 
+  Sparkles, 
+  Trophy, 
+  Zap,
+  Rocket,
+  Brain,
   Code,
-  BookOpen,
   MessageSquare,
-  CheckCircle,
-  Lock,
-  ArrowLeft,
-  ChevronRight,
-  ChevronDown,
-  ChevronUp
+  HelpCircle,
+  RotateCcw,
+  Save
 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
-const GameStudio = ({ activeQuest = null, onBackToQuests = () => {}, onQuestComplete = () => {} }) => {
+// Gravity Falls themed background
+const mysteryShackImg = 'https://images.unsplash.com/photo-1519681393784-d120267933ba?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=60';
+
+const Game = () => {
+  const navigate = useNavigate();
   const canvasRef = useRef(null);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [gameObjects, setGameObjects] = useState([]);
-  const [selectedTool, setSelectedTool] = useState('player');
+  const [gameState, setGameState] = useState('start');
   const [score, setScore] = useState(0);
-  const [gameCode, setGameCode] = useState('');
-  const [showCode, setShowCode] = useState(false);
-  const [questProgress, setQuestProgress] = useState(0);
-  const [showLessonComplete, setShowLessonComplete] = useState(false);
-  const [showTutorial, setShowTutorial] = useState(false);
-  const [activeTutorialStep, setActiveTutorialStep] = useState(0);
-  const animationFrameRef = useRef(null);
+  const [level, setLevel] = useState(1);
+  const [currentChallenge, setCurrentChallenge] = useState(null);
+  const [blocks, setBlocks] = useState([]);
+  const [output, setOutput] = useState('');
+  const [aiTip, setAiTip] = useState('');
+  const [showVictory, setShowVictory] = useState(false);
+  const [showHints, setShowHints] = useState(false);
+  const [chatMessages, setChatMessages] = useState([]);
+  const [chatInput, setChatInput] = useState('');
+  const [combo, setCombo] = useState(0);
+  const [timeSpent, setTimeSpent] = useState(0);
 
-  const tools = [
-    { id: 'player', name: 'Player', emoji: '🚀', color: '#3B82F6' },
-    { id: 'enemy', name: 'Enemy', emoji: '👾', color: '#EF4444' },
-    { id: 'collectible', name: 'Coin', emoji: '🪙', color: '#F59E0B' },
-    { id: 'obstacle', name: 'Wall', emoji: '🧱', color: '#6B7280' },
+  const challenges = [
+    {
+      id: 1,
+      title: "Arjun's Whispering Scroll",
+      description: "Help Arjun make the magical scroll speak by arranging printf blocks!",
+      concept: "printf",
+      difficulty: "Beginner",
+      xp: 50,
+      correctSequence: ['printf_start', 'text_The scroll speaks!', 'printf_end'],
+      blocksAvailable: [
+        { id: 'printf_start', type: 'block', text: 'printf(', color: 'bg-blue-600' },
+        { id: 'text_The scroll speaks!', type: 'value', text: '"The scroll speaks!"', color: 'bg-green-600' },
+        { id: 'printf_end', type: 'block', text: ');', color: 'bg-blue-600' },
+        { id: 'dummy_text', type: 'value', text: '"Wrong message"', color: 'bg-red-600' },
+        { id: 'dummy_print', type: 'block', text: 'print(', color: 'bg-red-600' }
+      ],
+      solutionOutput: "The scroll speaks!",
+      story: "Arjun needs your help in the Mystery Haveli! The scroll must say 'The scroll speaks!' to reveal its secrets.",
+      hints: [
+        "Use printf to display text on the screen",
+        "Enclose the text in double quotes",
+        "Don't forget the semicolon at the end!"
+      ]
+    },
+    {
+      id: 2,
+      title: "Priya's Enchanted Vault",
+      description: "Organize Priya's 75 gems using variable blocks!",
+      concept: "variables",
+      difficulty: "Beginner",
+      xp: 75,
+      correctSequence: ['int_start', 'gems', 'assign_75', 'printf_start', 'text_Gems: %d', 'gems_ref', 'printf_end'],
+      blocksAvailable: [
+        { id: 'int_start', type: 'block', text: 'int', color: 'bg-yellow-600' },
+        { id: 'gems', type: 'variable', text: 'gems', color: 'bg-orange-600' },
+        { id: 'assign_75', type: 'value', text: '= 75', color: 'bg-green-600' },
+        { id: 'printf_start', type: 'block', text: 'printf(', color: 'bg-blue-600' },
+        { id: 'text_Gems: %d', type: 'value', text: '"Gems: %d"', color: 'bg-green-600' },
+        { id: 'gems_ref', type: 'variable', text: 'gems', color: 'bg-orange-600' },
+        { id: 'printf_end', type: 'block', text: ');', color: 'bg-blue-600' },
+        { id: 'dummy_int', type: 'block', text: 'char', color: 'bg-red-600' },
+        { id: 'dummy_value', type: 'value', text: '= 50', color: 'bg-red-600' }
+      ],
+      solutionOutput: "Gems: 75",
+      story: "Priya's vault is a mess! Use variable blocks to catalog 75 mystical gems for her.",
+      hints: [
+        "Use int for whole numbers like 75",
+        "Assign the value with =",
+        "Use %d in printf to display the number"
+      ]
+    },
+    {
+      id: 3,
+      title: "The Sacred Amulet Mystery",
+      description: "Help Priya catalog the sacred amulet marked 'P' using character variables!",
+      concept: "char variables",
+      difficulty: "Beginner",
+      xp: 60,
+      correctSequence: ['char_start', 'amulet', 'assign_P', 'printf_start', 'text_Amulet: %c', 'amulet_ref', 'printf_end'],
+      blocksAvailable: [
+        { id: 'char_start', type: 'block', text: 'char', color: 'bg-purple-600' },
+        { id: 'amulet', type: 'variable', text: 'amulet', color: 'bg-pink-600' },
+        { id: 'assign_P', type: 'value', text: "= 'P'", color: 'bg-green-600' },
+        { id: 'printf_start', type: 'block', text: 'printf(', color: 'bg-blue-600' },
+        { id: 'text_Amulet: %c', type: 'value', text: '"Amulet: %c"', color: 'bg-green-600' },
+        { id: 'amulet_ref', type: 'variable', text: 'amulet', color: 'bg-pink-600' },
+        { id: 'printf_end', type: 'block', text: ');', color: 'bg-blue-600' },
+        { id: 'dummy_char', type: 'block', text: 'int', color: 'bg-red-600' },
+        { id: 'dummy_assign', type: 'value', text: '= 65', color: 'bg-red-600' }
+      ],
+      solutionOutput: "Amulet: P",
+      story: "Priya discovered a sacred amulet marked with the letter 'P'. Use character variables to catalog this mystical artifact!",
+      hints: [
+        "Use char for single letters",
+        "Enclose the letter in single quotes",
+        "Use %c in printf to show the character"
+      ]
+    },
+    {
+      id: 4,
+      title: "Combined Artifacts Display",
+      description: "Display both gems and amulet together in one printf statement!",
+      concept: "multiple variables",
+      difficulty: "Intermediate",
+      xp: 100,
+      correctSequence: ['int_start', 'gems', 'assign_75', 'char_start', 'amulet', 'assign_P', 'printf_start', 'text_Vault: %d gems, Amulet %c', 'gems_ref', 'amulet_ref', 'printf_end'],
+      blocksAvailable: [
+        { id: 'int_start', type: 'block', text: 'int', color: 'bg-yellow-600' },
+        { id: 'gems', type: 'variable', text: 'gems', color: 'bg-orange-600' },
+        { id: 'assign_75', type: 'value', text: '= 75', color: 'bg-green-600' },
+        { id: 'char_start', type: 'block', text: 'char', color: 'bg-purple-600' },
+        { id: 'amulet', type: 'variable', text: 'amulet', color: 'bg-pink-600' },
+        { id: 'assign_P', type: 'value', text: "= 'P'", color: 'bg-green-600' },
+        { id: 'printf_start', type: 'block', text: 'printf(', color: 'bg-blue-600' },
+        { id: 'text_Vault: %d gems, Amulet %c', type: 'value', text: '"Vault: %d gems, Amulet %c"', color: 'bg-green-600' },
+        { id: 'gems_ref', type: 'variable', text: 'gems', color: 'bg-orange-600' },
+        { id: 'amulet_ref', type: 'variable', text: 'amulet', color: 'bg-pink-600' },
+        { id: 'printf_end', type: 'block', text: ');', color: 'bg-blue-600' },
+        { id: 'dummy_text', type: 'value', text: '"Wrong format"', color: 'bg-red-600' }
+      ],
+      solutionOutput: "Vault: 75 gems, Amulet P",
+      story: "Priya wants to display both the gems and the amulet together. Combine the variables in one printf statement to show the complete vault inventory!",
+      hints: [
+        "Declare both variables before printing",
+        "Use %d for gems and %c for amulet in the same printf",
+        "Separate format specifiers with a comma in printf"
+      ]
+    }
   ];
 
-  // Quest-specific game configurations
-  const questGames = {
-    1: { // The Talking Screen
-      objects: [
-        { type: 'player', x: 50, y: 200, emoji: '🤖', behavior: 'print-messages' },
-      ],
-      behavior: (ctx, canvas, objects, setObjects, score, setScore) => {
-        const robot = objects.find(obj => obj.type === 'player');
-        if (!robot) return;
+  useEffect(() => {
+    setCurrentChallenge(challenges[0]);
+    setBlocks([]);
+    setOutput('');
+    setAiTip('Drag and drop the blocks to create the correct code sequence!');
+  }, []);
+
+  // Timer effect
+  useEffect(() => {
+    let interval;
+    if (gameState === 'playing') {
+      interval = setInterval(() => {
+        setTimeSpent(prev => prev + 1);
+      }, 1000);
+    }
+    return () => clearInterval(interval);
+  }, [gameState]);
+
+  useEffect(() => {
+    if (gameState === 'playing') {
+      const canvas = canvasRef.current;
+      const ctx = canvas.getContext('2d');
+      let animationFrameId;
+
+      const draw = () => {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
         
-        // Draw speech bubble
-        if (Date.now() % 3000 < 1500) {
+        // Draw Mystery Haveli background
+        const bgImage = new Image();
+        bgImage.src = mysteryShackImg;
+        ctx.drawImage(bgImage, 0, 0, canvas.width, canvas.height);
+
+        // Draw animated scroll or vault based on challenge
+        if (currentChallenge.id === 1) {
+          // Animated scroll
+          ctx.fillStyle = 'rgba(0, 191, 255, 0.5)';
+          ctx.beginPath();
+          ctx.arc(canvas.width / 2, canvas.height / 2, 50 + Math.sin(Date.now() / 500) * 10, 0, Math.PI * 2);
+          ctx.fill();
           ctx.fillStyle = 'white';
-          ctx.strokeStyle = '#ddd';
-          ctx.lineWidth = 2;
+          ctx.font = '20px Creepster';
+          ctx.fillText('📜', canvas.width / 2 - 10, canvas.height / 2 + 10);
+        } else if (currentChallenge.id === 2) {
+          // Animated vault
+          ctx.fillStyle = 'rgba(255, 215, 0, 0.5)';
+          ctx.fillRect(canvas.width / 2 - 50, canvas.height / 2 - 50, 100, 100);
+          ctx.fillStyle = 'white';
+          ctx.font = '20px Creepster';
+          ctx.fillText('🎁', canvas.width / 2 - 10, canvas.height / 2 + 10);
+        } else if (currentChallenge.id === 3) {
+          // Animated amulet
+          ctx.fillStyle = 'rgba(255, 0, 255, 0.5)';
           ctx.beginPath();
-          ctx.roundRect(robot.x + 50, robot.y - 40, 200, 40, 10);
+          ctx.arc(canvas.width / 2, canvas.height / 2, 40 + Math.cos(Date.now() / 300) * 8, 0, Math.PI * 2);
           ctx.fill();
-          ctx.stroke();
-          
-          ctx.fillStyle = 'black';
-          ctx.font = '14px Arial';
-          ctx.textAlign = 'left';
-          ctx.fillText('Hello, I am a robot!', robot.x + 60, robot.y - 20);
-        }
-
-        // Complete quest when player sees the message
-        if (score === 0) {
-          setScore(1);
-          setTimeout(() => {
-            setShowLessonComplete(true);
-            setQuestProgress(100);
-          }, 3000);
-        }
-      },
-      successCondition: (score) => score > 0,
-      tutorialSteps: [
-        {
-          title: "Welcome to C-Land!",
-          content: "This robot needs your help to learn how to speak using printf in C.",
-          position: { x: 100, y: 100 }
-        },
-        {
-          title: "The printf Function",
-          content: "In C, we use printf to display messages on the screen. Try making the robot talk!",
-          position: { x: 150, y: 150 }
-        }
-      ]
-    },
-    2: { // Captain Code's Treasure Boxes
-      objects: [
-        { type: 'player', x: 100, y: 200, emoji: '🧑‍💻', behavior: 'variable-boxes' },
-        { type: 'collectible', x: 200, y: 150, emoji: '💰', name: 'coins', value: 50 },
-        { type: 'collectible', x: 300, y: 150, emoji: '🏆', name: 'grade', value: 'A' },
-      ],
-      behavior: (ctx, canvas, objects, setObjects, score, setScore) => {
-        // Draw variable boxes with their values
-        objects.forEach(obj => {
-          if (obj.type === 'collectible') {
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
-            ctx.strokeStyle = '#ddd';
-            ctx.lineWidth = 2;
-            ctx.beginPath();
-            ctx.roundRect(obj.x - 20, obj.y - 50, 100, 40, 5);
-            ctx.fill();
-            ctx.stroke();
-            
-            ctx.fillStyle = 'black';
-            ctx.font = '12px Arial';
-            ctx.textAlign = 'left';
-            ctx.fillText(`${obj.name} = ${obj.value}`, obj.x - 15, obj.y - 30);
-          }
-        });
-
-        // Complete quest when player collects both variables
-        const player = objects.find(obj => obj.type === 'player');
-        const collected = objects.filter(obj => obj.type === 'collectible').length;
-        if (player && collected === 0 && score < 2) {
-          setScore(2);
-          setShowLessonComplete(true);
-          setQuestProgress(100);
-        }
-      },
-      successCondition: (score) => score >= 2,
-      tutorialSteps: [
-        {
-          title: "Variables in C",
-          content: "Variables are like treasure boxes that store values. Collect them to learn!",
-          position: { x: 200, y: 100 }
-        },
-        {
-          title: "Different Data Types",
-          content: "Variables can hold numbers (int), letters (char), and more. Each has its own box.",
-          position: { x: 300, y: 100 }
-        }
-      ]
-    },
-    3: { // The Math Machine
-      objects: [
-        { type: 'player', x: 100, y: 200, emoji: '🧑‍🏫', behavior: 'math-machine' },
-        { type: 'obstacle', x: 250, y: 150, emoji: '➕', width: 100, height: 100, operation: '+', a: 6, b: 3 },
-        { type: 'obstacle', x: 400, y: 150, emoji: '➖', width: 100, height: 100, operation: '-', a: 8, b: 5 },
-      ],
-      behavior: (ctx, canvas, objects, setObjects, score, setScore) => {
-        // Draw current math problem
-        const machine = objects.find(obj => obj.emoji === '➕' || obj.emoji === '➖');
-        if (machine) {
-          const a = machine.a || Math.floor(Math.random() * 10) + 1;
-          const b = machine.b || Math.floor(Math.random() * 10) + 1;
-          
-          ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
-          ctx.strokeStyle = '#ddd';
-          ctx.lineWidth = 2;
+          ctx.fillStyle = 'white';
+          ctx.font = '20px Creepster';
+          ctx.fillText('💎', canvas.width / 2 - 10, canvas.height / 2 + 10);
+        } else {
+          // Combined artifacts
+          ctx.fillStyle = 'rgba(255, 215, 0, 0.3)';
+          ctx.fillRect(canvas.width / 2 - 60, canvas.height / 2 - 40, 120, 80);
+          ctx.fillStyle = 'rgba(255, 0, 255, 0.3)';
           ctx.beginPath();
-          ctx.roundRect(machine.x - 30, machine.y - 60, 160, 50, 5);
+          ctx.arc(canvas.width / 2, canvas.height / 2, 30, 0, Math.PI * 2);
           ctx.fill();
-          ctx.stroke();
-          
-          ctx.fillStyle = 'black';
-          ctx.font = '20px Arial';
-          ctx.textAlign = 'center';
-          ctx.fillText(`${a} ${machine.operation} ${b} = ?`, machine.x + 50, machine.y - 30);
-          
-          // Check if player is on the machine to answer
-          const player = objects.find(obj => obj.type === 'player');
-          if (player && checkCollision(player, machine)) {
-            const answer = machine.operation === '+' ? a + b : a - b;
-            if (score < answer) {
-              setScore(answer);
-              if (answer === 9 || answer === 3) { // Correct answers for our problems
-                setQuestProgress(100);
-                setShowLessonComplete(true);
-              }
-            }
-          }
+          ctx.fillStyle = 'white';
+          ctx.font = '16px Creepster';
+          ctx.fillText('🎁💎', canvas.width / 2 - 15, canvas.height / 2 + 5);
         }
-      },
-      successCondition: (score) => score === 9 || score === 3,
-      tutorialSteps: [
-        {
-          title: "Math in C",
-          content: "C can perform calculations like addition (+) and subtraction (-).",
-          position: { x: 250, y: 100 }
-        },
-        {
-          title: "Operators",
-          content: "Try solving the math problems by moving to the operators.",
-          position: { x: 400, y: 100 }
-        }
-      ]
-    }
-  };
 
-  // Load the current quest game
-  useEffect(() => {
-    if (activeQuest && questGames[activeQuest.id]) {
-      const gameConfig = questGames[activeQuest.id];
-      const objects = gameConfig.objects.map((obj, index) => ({
-        id: `${obj.type}-${index}`,
-        type: obj.type,
-        x: obj.x,
-        y: obj.y,
-        width: obj.width || 40,
-        height: obj.height || 40,
-        color: tools.find((t) => t.id === obj.type)?.color || '#6B7280',
-        emoji: obj.emoji,
-        behavior: obj.behavior || 'static',
-        ...obj
-      }));
-      setGameObjects(objects);
-      setScore(0);
-      setIsPlaying(true); // Auto-start quest games
-      setQuestProgress(activeQuest.progress || 0);
-      setShowTutorial(true);
-      setActiveTutorialStep(0);
-    } else {
-      setGameObjects([]);
-      setScore(0);
-      setQuestProgress(0);
-      setShowTutorial(false);
-    }
-  }, [activeQuest]);
+        animationFrameId = requestAnimationFrame(draw);
+      };
 
-  // Game Loop and Rendering
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-
-    const draw = () => {
-      // Clear canvas
-      ctx.fillStyle = '#1F2937';
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-      // Draw grid
-      ctx.strokeStyle = '#374151';
-      ctx.lineWidth = 1;
-      for (let x = 0; x < canvas.width; x += 20) {
-        ctx.beginPath();
-        ctx.moveTo(x, 0);
-        ctx.lineTo(x, canvas.height);
-        ctx.stroke();
-      }
-      for (let y = 0; y < canvas.height; y += 20) {
-        ctx.beginPath();
-        ctx.moveTo(0, y);
-        ctx.lineTo(canvas.width, y);
-        ctx.stroke();
-      }
-
-      // Draw game objects
-      gameObjects.forEach((obj) => {
-        ctx.fillStyle = obj.color || '#6B7280';
-        ctx.fillRect(obj.x, obj.y, obj.width || 40, obj.height || 40);
-        ctx.font = '24px Arial';
-        ctx.textAlign = 'center';
-        ctx.fillText(obj.emoji, obj.x + (obj.width || 40) / 2, obj.y + (obj.height || 40) / 2 + 8);
-      });
-
-      // Draw score
-      ctx.fillStyle = 'white';
-      ctx.font = '20px Arial';
-      ctx.textAlign = 'left';
-      ctx.fillText(`Score: ${score}`, 10, 30);
-
-      // Draw quest progress if in quest mode
-      if (activeQuest) {
-        ctx.fillText(`Quest: ${activeQuest.title}`, 10, 60);
-        
-        // Draw progress bar
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
-        ctx.fillRect(10, 70, 200, 10);
-        ctx.fillStyle = getQuestColor(activeQuest);
-        ctx.fillRect(10, 70, 200 * (questProgress / 100), 10);
-      }
-
-      // Run quest-specific behavior
-      if (activeQuest && questGames[activeQuest.id]?.behavior) {
-        questGames[activeQuest.id].behavior(ctx, canvas, gameObjects, setGameObjects, score, setScore);
-      }
-    };
-
-    const update = () => {
-      if (!isPlaying) return;
-
-      // Check for quest completion
-      if (activeQuest && questGames[activeQuest.id]?.successCondition(score) && !showLessonComplete) {
-        setShowLessonComplete(true);
-        if (onQuestComplete) {
-          onQuestComplete(activeQuest.id);
-        }
-      }
-
-      // Update enemy movement (for generic enemies)
-      setGameObjects((prev) =>
-        prev.map((obj) => {
-          if (obj.type === 'enemy' && !activeQuest) {
-            return { ...obj, x: obj.x + Math.sin(Date.now() * 0.001) * 2 };
-          }
-          return obj;
-        })
-      );
-
-      // Check collisions (for generic game objects)
-      if (!activeQuest) {
-        const player = gameObjects.find((obj) => obj.type === 'player');
-        if (player) {
-          setGameObjects((prev) => {
-            const newObjects = prev.filter((obj) => {
-              if (obj.type === 'collectible' && checkCollision(player, obj)) {
-                setScore((prevScore) => prevScore + 10);
-                return false; // Remove collected item
-              }
-              if (obj.type === 'enemy' && checkCollision(player, obj)) {
-                setIsPlaying(false); // End game on enemy collision
-                alert('Game Over! You hit an enemy.');
-                return true;
-              }
-              if (obj.type === 'obstacle' && checkCollision(player, obj)) {
-                return true; // Prevent movement through obstacles
-              }
-              return true;
-            });
-            return newObjects;
-          });
-        }
-      }
-    };
-
-    const gameLoop = () => {
-      update();
       draw();
-      if (isPlaying) {
-        animationFrameRef.current = requestAnimationFrame(gameLoop);
-      }
-    };
+      return () => cancelAnimationFrame(animationFrameId);
+    }
+  }, [gameState, currentChallenge]);
 
-    if (isPlaying) {
-      animationFrameRef.current = requestAnimationFrame(gameLoop);
+  const handleDragStart = (e, block) => {
+    e.dataTransfer.setData('blockId', block.id);
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    const blockId = e.dataTransfer.getData('blockId');
+    const block = currentChallenge.blocksAvailable.find(b => b.id === blockId);
+    if (block) {
+      setBlocks([...blocks, block]);
+      setCombo(prev => prev + 1);
+    }
+  };
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+  };
+
+  const handleRemoveBlock = (index) => {
+    setBlocks(blocks.filter((_, i) => i !== index));
+    setCombo(0);
+  };
+
+  const handleRunCode = () => {
+    if (!currentChallenge) return;
+
+    const blockSequence = blocks.map(b => b.id);
+    if (JSON.stringify(blockSequence) === JSON.stringify(currentChallenge.correctSequence)) {
+      setOutput(currentChallenge.solutionOutput);
+      const comboBonus = Math.floor(combo / 3) * 10;
+      const timeBonus = Math.max(0, 50 - Math.floor(timeSpent / 10));
+      const totalXP = currentChallenge.xp + comboBonus + timeBonus;
+      
+      setScore(prev => prev + totalXP);
+      setShowVictory(true);
+      setAiTip(`Fantastic, young detective! You've earned ${totalXP} XP! (${currentChallenge.xp} base + ${comboBonus} combo + ${timeBonus} time bonus)`);
+      
+      if (level < challenges.length) {
+        setTimeout(() => {
+          setLevel(prev => prev + 1);
+          setCurrentChallenge(challenges[level]);
+          setBlocks([]);
+          setOutput('');
+          setShowVictory(false);
+          setCombo(0);
+          setTimeSpent(0);
+          setAiTip('New challenge awaits! Drag the blocks to solve it.');
+        }, 2000);
+      }
     } else {
-      draw();
-    }
-
-    return () => {
-      if (animationFrameRef.current) {
-        cancelAnimationFrame(animationFrameRef.current);
-      }
-    };
-  }, [gameObjects, isPlaying, score, activeQuest, questProgress, showLessonComplete]);
-
-  // Keyboard Controls
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      if (!isPlaying) return;
-
-      const speed = 5;
-      setGameObjects((prev) =>
-        prev.map((obj) => {
-          if (obj.type !== 'player') return obj;
-
-          let newX = obj.x;
-          let newY = obj.y;
-
-          if (e.key === 'ArrowLeft' || e.key === 'a') newX -= speed;
-          if (e.key === 'ArrowRight' || e.key === 'd') newX += speed;
-          if (e.key === 'ArrowUp' || e.key === 'w') newY -= speed;
-          if (e.key === 'ArrowDown' || e.key === 's') newY += speed;
-
-          // Keep player within canvas bounds
-          newX = Math.max(0, Math.min(newX, canvasRef.current.width - (obj.width || 40)));
-          newY = Math.max(0, Math.min(newY, canvasRef.current.height - (obj.height || 40)));
-
-          // Check for collisions with obstacles
-          const willCollide = gameObjects.some(
-            (other) =>
-              other.type === 'obstacle' &&
-              other.id !== obj.id &&
-              checkCollision(
-                { ...obj, x: newX, y: newY, width: obj.width || 40, height: obj.height || 40 },
-                { ...other, width: other.width || 40, height: other.height || 40 }
-              )
-          );
-
-          if (!willCollide) {
-            return { ...obj, x: newX, y: newY };
-          }
-          return obj;
-        })
-      );
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isPlaying, gameObjects]);
-
-  const checkCollision = (obj1, obj2) => {
-    return (
-      obj1.x < obj2.x + (obj2.width || 40) &&
-      obj1.x + (obj1.width || 40) > obj2.x &&
-      obj1.y < obj2.y + (obj2.height || 40) &&
-      obj1.y + (obj1.height || 40) > obj2.y
-    );
-  };
-
-  const getQuestColor = (quest) => {
-    const colorMap = {
-      'from-blue-500 to-cyan-500': '#3B82F6',
-      'from-green-500 to-emerald-500': '#10B981',
-      'from-yellow-500 to-orange-500': '#F59E0B',
-      'from-purple-500 to-pink-500': '#8B5CF6',
-      'from-emerald-500 to-teal-500': '#10B981',
-      'from-red-500 to-pink-500': '#EF4444',
-      'from-indigo-500 to-blue-500': '#6366F1',
-      'from-orange-500 to-red-500': '#F97316',
-      'from-cyan-500 to-blue-500': '#06B6D4',
-      'from-gray-500 to-indigo-500': '#6B7280',
-    };
-    return colorMap[quest.color] || '#3B82F6';
-  };
-
-  const handleCanvasClick = (event) => {
-    if (isPlaying || activeQuest) return;
-
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    const rect = canvas.getBoundingClientRect();
-    const x = event.clientX - rect.left;
-    const y = event.clientY - rect.top;
-
-    const tool = tools.find((t) => t.id === selectedTool);
-    if (!tool) return;
-
-    if (selectedTool === 'player' && gameObjects.some((obj) => obj.type === 'player')) {
-      alert('Only one player can be added!');
-      return;
-    }
-
-    const newObject = {
-      id: `${selectedTool}-${Date.now()}`,
-      type: selectedTool,
-      x: Math.floor(x / 20) * 20,
-      y: Math.floor(y / 20) * 20,
-      width: 40,
-      height: 40,
-      color: tool.color,
-      emoji: tool.emoji,
-      behavior: selectedTool === 'player' ? 'player-controlled' : 'static',
-    };
-
-    setGameObjects((prev) => [...prev, newObject]);
-  };
-
-  const playGame = () => {
-    setIsPlaying(!isPlaying);
-    if (!isPlaying && !activeQuest) {
-      generateGameCode();
+      setOutput('The mystery remains unsolved! Check your block sequence.');
+      setAiTip('Try arranging the blocks in the correct order. Need a hint?');
+      setCombo(0);
     }
   };
 
-  const generateGameCode = () => {
-    if (activeQuest) {
-      setGameCode(activeQuest.code);
-      return;
-    }
-    
-    const code = `
-      // Auto-generated game code
-      const gameObjects = ${JSON.stringify(gameObjects, null, 2)};
-      
-      function update() {
-        // Game logic would go here
-      }
-      
-      function draw() {
-        // Rendering would go here
-      }
-      
-      function gameLoop() {
-        update();
-        draw();
-        requestAnimationFrame(gameLoop);
-      }
-      
-      gameLoop();
-    `;
-    setGameCode(code);
+  const handleReset = () => {
+    setBlocks([]);
+    setOutput('');
+    setCombo(0);
+    setTimeSpent(0);
+    setAiTip('Blocks reset! Try arranging them again to solve the mystery.');
   };
 
-  const clearCanvas = () => {
-    setGameObjects([]);
+  const handleStartGame = () => {
+    setGameState('playing');
     setScore(0);
-    setIsPlaying(false);
-    setQuestProgress(0);
+    setLevel(1);
+    setCurrentChallenge(challenges[0]);
+    setBlocks([]);
+    setOutput('');
+    setCombo(0);
+    setTimeSpent(0);
+    setAiTip('Drag and drop the blocks to create the correct code sequence!');
   };
 
-  const nextTutorialStep = () => {
-    if (activeQuest && questGames[activeQuest.id]?.tutorialSteps) {
-      if (activeTutorialStep < questGames[activeQuest.id].tutorialSteps.length - 1) {
-        setActiveTutorialStep(activeTutorialStep + 1);
-      } else {
-        setShowTutorial(false);
-      }
+  const handleShowHints = () => {
+    setShowHints(!showHints);
+  };
+
+  const handleChatSubmit = () => {
+    if (chatInput.trim()) {
+      setChatMessages([...chatMessages, { user: true, text: chatInput }]);
+      // Simulate AI response
+      const aiResponses = [
+        "Great question! Can you clarify what part of the code is puzzling you?",
+        "Let's break it down. Try focusing on the printf syntax first!",
+        "I'm here to help! Could you share what output you're seeing?",
+        "Remember, the order of blocks matters in programming!",
+        "Check if you're using the right format specifiers (%d for numbers, %c for characters)"
+      ];
+      setTimeout(() => {
+        setChatMessages(prev => [...prev, { user: false, text: aiResponses[Math.floor(Math.random() * aiResponses.length)] }]);
+      }, 1000);
+      setChatInput('');
     }
+  };
+
+  const formatTime = (seconds) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 text-white p-4">
-      <div className="max-w-7xl mx-auto">
+    <div className="min-h-screen bg-gradient-to-br from-blue-900 via-gray-800 to-green-900 text-white p-4 sm:p-6 font-['Creepster',_cursive]">
+      <style>
+        {`
+          @import url('https://fonts.googleapis.com/css2?family=Creepster&display=swap');
+          body {
+            background-image: url('${mysteryShackImg}');
+            background-size: cover;
+            background-attachment: fixed;
+            background-position: center;
+          }
+        `}
+      </style>
+      <div className="max-w-6xl mx-auto">
+        {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
           className="mb-8"
         >
+          <button
+            onClick={() => navigate('/quests')}
+            className="flex items-center gap-2 text-yellow-200 hover:text-yellow-300 mb-4 transition-colors"
+          >
+            <ArrowLeft className="w-6 h-6" />
+            Back to Mystery Map
+          </button>
           <div className="flex items-center justify-between flex-wrap gap-4">
             <div>
-              <h1 className="text-4xl font-bold mb-2 flex items-center gap-3">
-                <Gamepad2 className="w-10 h-10 text-purple-400" />
-                {activeQuest ? activeQuest.title : 'C-Land Game Studio'}
+              <h1 className="text-3xl sm:text-4xl font-bold mb-2 flex items-center gap-3 text-yellow-200">
+                <Ghost className="w-8 h-8 sm:w-10 sm:h-10 text-blue-300" />
+                Mystery Code Game
               </h1>
-              <p className="text-xl text-gray-300">
-                {activeQuest ? activeQuest.description : 'Create games and learn C programming!'}
+              <p className="text-lg sm:text-xl text-gray-300">
+                Drag and drop blocks to solve coding mysteries in the Mystery Haveli!
               </p>
             </div>
             <div className="flex items-center gap-4">
-              {activeQuest && (
-                <button
-                  onClick={onBackToQuests}
-                  className="flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 rounded-lg transition-colors"
-                >
-                  <ArrowLeft className="w-4 h-4" />
-                  Back to Quests
-                </button>
-              )}
-              <button
-                onClick={() => setShowCode(!showCode)}
-                className="flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 rounded-lg transition-colors"
-              >
-                <Code className="w-4 h-4" />
-                {showCode ? 'Hide Code' : 'Show Code'}
-              </button>
-              {!activeQuest && (
-                <button
-                  onClick={playGame}
-                  className={`flex items-center gap-2 px-6 py-3 rounded-lg font-semibold transition-all duration-300 transform hover:scale-105 ${
-                    isPlaying
-                      ? 'bg-red-500 hover:bg-red-600'
-                      : 'bg-green-500 hover:bg-green-600'
-                  }`}
-                >
-                  {isPlaying ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5" />}
-                  {isPlaying ? 'Stop Game' : 'Play Game'}
-                </button>
+              <div className="bg-gray-800/50 backdrop-blur-sm rounded-2xl px-4 sm:px-6 py-3 sm:py-4 border border-yellow-800/50">
+                <div className="flex items-center gap-2">
+                  <Star className="w-5 h-5 text-yellow-600" />
+                  <span className="font-semibold text-yellow-200">{score} XP</span>
+                </div>
+              </div>
+              <div className="bg-gray-800/50 backdrop-blur-sm rounded-2xl px-4 sm:px-6 py-3 sm:py-4 border border-yellow-800/50">
+                <div className="flex items-center gap-2">
+                  <Trophy className="w-5 h-5 text-blue-300" />
+                  <span className="font-semibold text-yellow-200">Level {level}</span>
+                </div>
+              </div>
+              {gameState === 'playing' && (
+                <>
+                  <div className="bg-gray-800/50 backdrop-blur-sm rounded-2xl px-4 sm:px-6 py-3 sm:py-4 border border-yellow-800/50">
+                    <div className="flex items-center gap-2">
+                      <Zap className="w-5 h-5 text-green-400" />
+                      <span className="font-semibold text-yellow-200">Combo: {combo}</span>
+                    </div>
+                  </div>
+                  <div className="bg-gray-800/50 backdrop-blur-sm rounded-2xl px-4 sm:px-6 py-3 sm:py-4 border border-yellow-800/50">
+                    <div className="flex items-center gap-2">
+                      <Brain className="w-5 h-5 text-purple-400" />
+                      <span className="font-semibold text-yellow-200">{formatTime(timeSpent)}</span>
+                    </div>
+                  </div>
+                </>
               )}
             </div>
           </div>
         </motion.div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-          <motion.div
-            initial={{ opacity: 0, x: -30 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            className="lg:col-span-3"
-          >
-            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-xl font-semibold">
-                  {activeQuest ? 'Quest Game' : 'Game Canvas'}
-                </h3>
-                <div className="flex items-center gap-2">
-                  <div className="text-lg font-bold">Score: {score}</div>
-                  {!activeQuest && (
-                    <button
-                      onClick={clearCanvas}
-                      className="p-2 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-lg transition-colors"
-                    >
-                      <RotateCcw className="w-4 h-4" />
-                    </button>
-                  )}
+        {/* Start Screen */}
+        <AnimatePresence>
+          {gameState === 'start' && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.8 }}
+              className="bg-gray-800/50 backdrop-blur-sm rounded-2xl p-6 border border-yellow-800/50 mb-6 text-center"
+            >
+              <h2 className="text-xl sm:text-2xl font-semibold mb-4 text-yellow-200 flex items-center justify-center gap-2">
+                <Sparkles className="w-6 h-6" />
+                Welcome to the Mystery Code Game!
+              </h2>
+              <p className="text-gray-300 mb-6">
+                Join Arjun and Priya in the Mystery Haveli to solve coding challenges using drag-and-drop blocks. Each correct sequence earns you XP and unlocks new mysteries!
+              </p>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                <div className="bg-gray-700/50 rounded-lg p-4">
+                  <h3 className="text-lg font-semibold text-yellow-200 mb-2">📜 Printf Magic</h3>
+                  <p className="text-sm text-gray-300">Learn to make text appear on screen</p>
+                </div>
+                <div className="bg-gray-700/50 rounded-lg p-4">
+                  <h3 className="text-lg font-semibold text-yellow-200 mb-2">🎁 Variable Vault</h3>
+                  <p className="text-sm text-gray-300">Store and display numbers and characters</p>
+                </div>
+                <div className="bg-gray-700/50 rounded-lg p-4">
+                  <h3 className="text-lg font-semibold text-yellow-200 mb-2">💎 Combined Powers</h3>
+                  <p className="text-sm text-gray-300">Mix different data types together</p>
                 </div>
               </div>
+              <button
+                onClick={handleStartGame}
+                className="bg-gradient-to-r from-yellow-600 to-red-600 hover:from-yellow-700 hover:to-red-700 px-6 py-3 rounded-full font-semibold transition-all duration-300 flex items-center gap-2 mx-auto text-yellow-200"
+              >
+                <Play className="w-5 h-5" />
+                Start Game
+              </button>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
-              <div className="relative">
+        {/* Game Screen */}
+        {gameState === 'playing' && currentChallenge && (
+          <>
+            {/* Challenge Info */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+              className="bg-gray-800/50 backdrop-blur-sm rounded-2xl p-6 border border-yellow-800/50 mb-6"
+            >
+              <h2 className="text-xl sm:text-2xl font-semibold mb-4 text-yellow-200 flex items-center gap-2">
+                <BookOpen className="w-6 h-6" />
+                {currentChallenge.title}
+              </h2>
+              <p className="text-gray-300 mb-4">{currentChallenge.story}</p>
+              <div className="flex items-center gap-2 mb-4">
+                <Rocket className="w-5 h-5 text-blue-300" />
+                <span className="text-sm font-medium text-yellow-200">Task: {currentChallenge.description}</span>
+              </div>
+              <div className="flex items-center gap-4">
+                <span className="text-sm text-gray-300">Difficulty: <span className="text-yellow-200">{currentChallenge.difficulty}</span></span>
+                <span className="text-sm text-gray-300">Concept: <span className="text-yellow-200">{currentChallenge.concept}</span></span>
+                <span className="text-sm text-gray-300">XP: <span className="text-yellow-200">{currentChallenge.xp}</span></span>
+              </div>
+            </motion.div>
+
+            {/* Game Canvas and Blocks */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.4 }}
+              className="grid grid-cols-1 lg:grid-cols-3 gap-6"
+            >
+              {/* Canvas */}
+              <div className="lg:col-span-2 bg-gray-900 rounded-2xl p-6 border border-yellow-800/50">
+                <h3 className="text-lg font-semibold mb-4 text-yellow-200">Mystery Haveli</h3>
                 <canvas
                   ref={canvasRef}
                   width={600}
                   height={400}
-                  onClick={handleCanvasClick}
-                  className="border border-gray-600 rounded-lg cursor-crosshair bg-gray-800"
+                  className="w-full h-64 sm:h-80 rounded-md bg-gray-800"
                 />
-                {!isPlaying && !activeQuest && gameObjects.length === 0 && (
-                  <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-lg">
-                    <div className="text-center">
-                      <Gamepad2 className="w-16 h-16 text-purple-400 mx-auto mb-4" />
-                      <p className="text-lg font-semibold mb-2">Click to add game objects!</p>
-                      <p className="text-gray-300">Select a tool from the sidebar and click on the canvas</p>
-                    </div>
+                <div
+                  className="mt-4 p-4 bg-gray-800 rounded-md min-h-[100px]"
+                  onDrop={handleDrop}
+                  onDragOver={handleDragOver}
+                >
+                  <h4 className="text-sm font-semibold text-yellow-200 mb-2">Code Workspace</h4>
+                  <div className="flex flex-wrap gap-2">
+                    {blocks.map((block, index) => (
+                      <div
+                        key={index}
+                        className={`px-4 py-2 rounded-md ${block.color} text-white cursor-pointer hover:opacity-80 transition-all duration-200`}
+                        onClick={() => handleRemoveBlock(index)}
+                      >
+                        {block.text}
+                      </div>
+                    ))}
                   </div>
-                )}
+                </div>
               </div>
 
-              {isPlaying && (
-                <div className="mt-4 p-4 bg-black/30 rounded-lg">
-                  <div className="flex items-center justify-center gap-4">
-                    <div className="text-center">
-                      <div className="text-sm text-gray-400 mb-1">Controls</div>
-                      <div className="flex gap-2">
-                        <kbd className="px-2 py-1 bg-white/20 rounded text-xs">WASD</kbd>
-                        <span className="text-gray-400">or</span>
-                        <kbd className="px-2 py-1 bg-white/20 rounded text-xs">Arrow Keys</kbd>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {showLessonComplete && (
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.3 }}
-                  className="absolute inset-0 flex items-center justify-center bg-black/70 rounded-lg"
-                >
-                  <div className="bg-gradient-to-r from-green-500 to-emerald-600 p-6 rounded-xl max-w-md text-center">
-                    <CheckCircle className="w-16 h-16 mx-auto mb-4 text-white" />
-                    <h3 className="text-2xl font-bold mb-2">Lesson Complete!</h3>
-                    <p className="mb-4">{activeQuest?.lesson}</p>
-                    <div className="flex justify-center gap-4">
-                      <button
-                        onClick={() => {
-                          setShowLessonComplete(false);
-                          onBackToQuests();
-                        }}
-                        className="px-6 py-2 bg-white text-emerald-600 rounded-lg font-semibold"
-                      >
-                        Continue
-                      </button>
-                    </div>
-                  </div>
-                </motion.div>
-              )}
-
-              {showTutorial && activeQuest && questGames[activeQuest.id]?.tutorialSteps && (
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="absolute bottom-4 left-4 right-4 bg-gradient-to-r from-purple-600 to-blue-600 rounded-xl p-4 shadow-lg"
-                >
-                  <div className="flex items-start gap-3">
-                    <div className="bg-white/20 p-2 rounded-full">
-                      <MessageSquare className="w-5 h-5 text-white" />
-                    </div>
-                    <div className="flex-1">
-                      <h4 className="font-bold mb-1">
-                        {questGames[activeQuest.id].tutorialSteps[activeTutorialStep].title}
-                      </h4>
-                      <p className="text-sm">
-                        {questGames[activeQuest.id].tutorialSteps[activeTutorialStep].content}
-                      </p>
-                    </div>
-                    <button
-                      onClick={nextTutorialStep}
-                      className="bg-white/20 hover:bg-white/30 p-2 rounded-full transition-colors"
+              {/* Block Palette */}
+              <div className="bg-gray-800/50 backdrop-blur-sm rounded-2xl p-6 border border-yellow-800/50">
+                <h3 className="text-lg font-semibold mb-4 text-yellow-200">Block Palette</h3>
+                <div className="grid grid-cols-2 gap-2">
+                  {currentChallenge.blocksAvailable.map((block) => (
+                    <div
+                      key={block.id}
+                      draggable
+                      onDragStart={(e) => handleDragStart(e, block)}
+                      className={`px-4 py-2 rounded-md ${block.color} text-white cursor-move hover:opacity-80 text-center transition-all duration-200`}
                     >
-                      {activeTutorialStep < questGames[activeQuest.id].tutorialSteps.length - 1 ? (
-                        <ChevronRight className="w-4 h-4" />
-                      ) : (
-                        <CheckCircle className="w-4 h-4" />
-                      )}
-                    </button>
-                  </div>
-                </motion.div>
-              )}
-            </div>
-
-            {showCode && (
-              <motion.div
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5 }}
-                className="mt-6 bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20"
-              >
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-xl font-semibold flex items-center gap-2">
-                    <Code className="w-5 h-5 text-green-400" />
-                    {activeQuest ? 'Code Example' : 'Generated Game Code'}
-                  </h3>
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => navigator.clipboard.writeText(gameCode || activeQuest?.code || '')}
-                      className="px-3 py-1 bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 rounded text-sm transition-colors"
-                    >
-                      Copy
-                    </button>
-                  </div>
-                </div>
-                <pre className="bg-black/50 p-4 rounded-lg overflow-x-auto text-sm font-mono text-gray-300 max-h-96">
-                  {activeQuest ? activeQuest.code : gameCode || '// Click "Play Game" to generate code'}
-                </pre>
-              </motion.div>
-            )}
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, x: 30 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8, delay: 0.3 }}
-            className="space-y-6"
-          >
-            {!activeQuest && (
-              <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
-                <h3 className="text-xl font-semibold mb-4 flex items-center gap-2">
-                  <Palette className="w-5 h-5 text-purple-400" />
-                  Game Objects
-                </h3>
-                <div className="space-y-2">
-                  {tools.map((tool) => (
-                    <button
-                      key={tool.id}
-                      onClick={() => setSelectedTool(tool.id)}
-                      className={`w-full flex items-center gap-3 p-3 rounded-lg transition-all duration-300 ${
-                        selectedTool === tool.id
-                          ? 'bg-white/20 border border-white/30'
-                          : 'bg-white/5 hover:bg-white/10'
-                      }`}
-                    >
-                      <div className="text-2xl">{tool.emoji}</div>
-                      <div className="text-left">
-                        <div className="font-medium">{tool.name}</div>
-                        <div className="text-xs text-gray-400">Click to select</div>
-                      </div>
-                    </button>
+                      {block.text}
+                    </div>
                   ))}
                 </div>
               </div>
-            )}
+            </motion.div>
 
-            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
-              <h3 className="text-xl font-semibold mb-4 flex items-center gap-2">
-                <Trophy className="w-5 h-5 text-yellow-400" />
-                Game Stats
-              </h3>
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <span className="text-gray-300">Objects</span>
-                  <span className="font-semibold">{gameObjects.length}</span>
+            {/* Controls and Output */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.6 }}
+              className="bg-gray-900 rounded-2xl p-6 border border-yellow-800/50 mb-6"
+            >
+              <div className="flex flex-wrap gap-4 mb-4">
+                <button
+                  onClick={handleRunCode}
+                  className="bg-gradient-to-r from-yellow-600 to-red-600 hover:from-yellow-700 hover:to-red-700 px-6 py-3 rounded-full font-semibold transition-all duration-300 flex items-center gap-2 text-yellow-200"
+                >
+                  <Play className="w-5 h-5" />
+                  Run Code
+                </button>
+                <button
+                  onClick={handleReset}
+                  className="bg-gray-800/50 hover:bg-gray-700/50 px-6 py-3 rounded-full font-semibold transition-all duration-300 flex items-center gap-2 text-yellow-200"
+                >
+                  <RotateCcw className="w-5 h-5" />
+                  Reset Blocks
+                </button>
+                <button
+                  onClick={handleShowHints}
+                  className="bg-gray-800/50 hover:bg-gray-700/50 px-6 py-3 rounded-full font-semibold transition-all duration-300 flex items-center gap-2 text-yellow-200"
+                >
+                  <HelpCircle className="w-5 h-5" />
+                  {showHints ? 'Hide Hints' : 'Show Hints'}
+                </button>
+              </div>
+              
+              {/* Hints Section */}
+              <AnimatePresence>
+                {showHints && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    exit={{ opacity: 0, height: 0 }}
+                    className="mt-4 p-4 bg-gray-800 rounded-md overflow-hidden"
+                  >
+                    <h3 className="text-lg font-semibold text-yellow-200 flex items-center gap-2 mb-2">
+                      <HelpCircle className="w-5 h-5" />
+                      Hints
+                    </h3>
+                    <ul className="list-disc list-inside text-gray-300 space-y-1">
+                      {currentChallenge.hints.map((hint, index) => (
+                        <li key={index} className="text-sm">{hint}</li>
+                      ))}
+                    </ul>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
+              {output && (
+                <div className="mt-4 p-4 bg-gray-800 rounded-md">
+                  <h3 className="text-lg font-semibold text-yellow-200">Output:</h3>
+                  <p className={`text-${output === currentChallenge.solutionOutput ? 'green-400' : 'red-400'}`}>
+                    {output}
+                  </p>
                 </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-gray-300">Players</span>
-                  <span className="font-semibold">
-                    {gameObjects.filter((obj) => obj.type === 'player').length}
-                  </span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-gray-300">Enemies</span>
-                  <span className="font-semibold">
-                    {gameObjects.filter((obj) => obj.type === 'enemy').length}
-                  </span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-gray-300">Collectibles</span>
-                  <span className="font-semibold">
-                    {gameObjects.filter((obj) => obj.type === 'collectible').length}
-                  </span>
-                </div>
-                {activeQuest && (
-                  <>
-                    <div className="flex items-center justify-between">
-                      <span className="text-gray-300">Progress</span>
-                      <span className="font-semibold">{questProgress}%</span>
+              )}
+            </motion.div>
+
+            {/* AI Mentor Chat */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.7 }}
+              className="bg-gray-800/50 backdrop-blur-sm rounded-2xl p-6 border border-yellow-800/50 mb-6"
+            >
+              <h2 className="text-xl sm:text-2xl font-semibold mb-4 text-yellow-200 flex items-center gap-2">
+                <MessageSquare className="w-6 h-6" />
+                AI Mentor Chat
+              </h2>
+              <div className="h-48 sm:h-64 overflow-y-auto bg-gray-900 p-4 rounded-md mb-4">
+                {chatMessages.length === 0 ? (
+                  <p className="text-gray-400 text-center">Ask the AI Mentor for help with your code!</p>
+                ) : (
+                  chatMessages.map((msg, index) => (
+                    <div
+                      key={index}
+                      className={`mb-2 p-2 rounded-md ${
+                        msg.user ? 'bg-blue-600/20 text-blue-300 ml-auto' : 'bg-yellow-600/20 text-yellow-200'
+                      }`}
+                    >
+                      <p className="text-sm">{msg.text}</p>
                     </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-gray-300">XP Reward</span>
-                      <span className="font-semibold flex items-center gap-1">
-                        <Star className="w-4 h-4 text-yellow-400" />
-                        {activeQuest.xp}
-                      </span>
-                    </div>
-                  </>
+                  ))
                 )}
               </div>
-            </div>
-
-            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
-              <h3 className="text-xl font-semibold mb-4">Actions</h3>
-              <div className="space-y-3">
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={chatInput}
+                  onChange={(e) => setChatInput(e.target.value)}
+                  onKeyPress={(e) => e.key === 'Enter' && handleChatSubmit()}
+                  className="flex-1 bg-gray-800 p-3 rounded-md text-white text-sm focus:outline-none focus:ring-2 focus:ring-yellow-600"
+                  placeholder="Ask the AI Mentor a question..."
+                />
                 <button
-                  onClick={() => {
-                    const code = activeQuest ? activeQuest.code : gameCode;
-                    navigator.clipboard.writeText(code || '');
-                    alert('Code copied to clipboard!');
-                  }}
-                  className="w-full flex items-center gap-2 justify-center py-3 bg-blue-500 hover:bg-blue-600 rounded-lg font-medium transition-colors"
+                  onClick={handleChatSubmit}
+                  className="bg-gradient-to-r from-yellow-600 to-red-600 hover:from-yellow-700 hover:to-red-700 px-4 py-3 rounded-full font-semibold transition-all duration-300 text-yellow-200"
                 >
-                  <Save className="w-4 h-4" />
-                  Copy Code
-                </button>
-                <button
-                  onClick={() => {
-                    const code = activeQuest ? activeQuest.code : gameCode;
-                    const blob = new Blob([code], { type: 'text/javascript' });
-                    const url = URL.createObjectURL(blob);
-                    const a = document.createElement('a');
-                    a.href = url;
-                    a.download = activeQuest ? `${activeQuest.title.toLowerCase().replace(/\s+/g, '-')}.c` : 'game.js';
-                    a.click();
-                    URL.revokeObjectURL(url);
-                  }}
-                  className="w-full flex items-center gap-2 justify-center py-3 bg-purple-500 hover:bg-purple-600 rounded-lg font-medium transition-colors"
-                >
-                  <Download className="w-4 h-4" />
-                  Export Code
+                  Send
                 </button>
               </div>
-            </div>
-          </motion.div>
-        </div>
+            </motion.div>
+
+            {/* AI Mentor Suggestion */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.8 }}
+              className="bg-gradient-to-r from-blue-600/20 to-yellow-600/20 backdrop-blur-sm rounded-2xl p-6 border border-blue-600/30"
+            >
+              <div className="flex items-center gap-4">
+                <div className="w-16 h-16 rounded-full bg-gradient-to-r from-blue-600 to-yellow-600 flex items-center justify-center text-2xl">
+                  🦁
+                </div>
+                <div>
+                  <h3 className="text-xl font-semibold mb-2 text-yellow-200">AI Mentor Tip</h3>
+                  <p className="text-gray-300">{aiTip}</p>
+                </div>
+              </div>
+            </motion.div>
+
+            {/* Victory Screen */}
+            <AnimatePresence>
+              {showVictory && (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.8 }}
+                  className="fixed inset-0 bg-black/80 flex items-center justify-center z-50"
+                >
+                  <div className="bg-gray-900 rounded-2xl p-8 border border-yellow-800/50 text-center max-w-md mx-4">
+                    <h2 className="text-2xl font-semibold mb-4 text-yellow-200 flex items-center justify-center gap-2">
+                      <CheckCircle className="w-8 h-8 text-green-400" />
+                      Mystery Solved!
+                    </h2>
+                    <div className="mb-4 space-y-2">
+                      <p className="text-gray-300">You've earned {currentChallenge.xp} XP!</p>
+                      {combo > 3 && <p className="text-green-400">+{Math.floor(combo / 3) * 10} XP Combo Bonus!</p>}
+                      {timeSpent < 50 && <p className="text-blue-400">+{Math.max(0, 50 - Math.floor(timeSpent / 10))} XP Speed Bonus!</p>}
+                    </div>
+                    <button
+                      onClick={() => {
+                        setShowVictory(false);
+                        if (level < challenges.length) {
+                          setCurrentChallenge(challenges[level]);
+                          setBlocks([]);
+                          setOutput('');
+                          setCombo(0);
+                          setTimeSpent(0);
+                          setAiTip('New challenge awaits! Drag the blocks to solve it.');
+                        } else {
+                          setGameState('start');
+                        }
+                      }}
+                      className="bg-gradient-to-r from-yellow-600 to-red-600 hover:from-yellow-700 hover:to-red-700 px-6 py-3 rounded-full font-semibold transition-all duration-300 text-yellow-200"
+                    >
+                      {level < challenges.length ? 'Next Challenge' : 'Return to Menu'}
+                    </button>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </>
+        )}
       </div>
     </div>
   );
 };
 
-GameStudio.propTypes = {
-  activeQuest: PropTypes.shape({
-    id: PropTypes.number.isRequired,
-    title: PropTypes.string.isRequired,
-    description: PropTypes.string.isRequired,
-    difficulty: PropTypes.string.isRequired,
-    xp: PropTypes.number.isRequired,
-    status: PropTypes.string.isRequired,
-    progress: PropTypes.number.isRequired,
-    chapters: PropTypes.number.isRequired,
-    completedChapters: PropTypes.number.isRequired,
-    icon: PropTypes.string.isRequired,
-    color: PropTypes.string.isRequired,
-    skills: PropTypes.arrayOf(PropTypes.string).isRequired,
-    code: PropTypes.string.isRequired,
-    lesson: PropTypes.string.isRequired
-  }),
-  onBackToQuests: PropTypes.func,
-  onQuestComplete: PropTypes.func
-};
-
-GameStudio.defaultProps = {
-  activeQuest: null,
-  onBackToQuests: () => {},
-  onQuestComplete: () => {}
-};
-
-export default GameStudio;
+export default Game;
