@@ -24,7 +24,7 @@ const LoadingScreen = ({ message = "Loading your coding adventure..." }) => {
           <div className="flex items-center justify-center gap-3 mb-4">
             <Sparkles className="w-12 h-12 text-yellow-400" />
             <h1 className="text-5xl font-bold bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
-              CodeVerse
+              0xKid
             </h1>
             <Code className="w-12 h-12 text-cyan-400" />
           </div>
