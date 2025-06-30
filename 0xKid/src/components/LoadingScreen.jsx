@@ -38,7 +38,7 @@ const LoadingScreen = ({ message = "Unraveling your coding mystery..." }) => {
           <div className="flex items-center justify-center gap-3 mb-4">
             <Ghost className="w-12 h-12 text-blue-300" />
             <h1 className="text-5xl font-bold bg-gradient-to-r from-blue-300 to-yellow-600 bg-clip-text text-transparent">
-              ......0xKid......
+              _____0xKid_____
             </h1>
             <BookOpen className="w-12 h-12 text-yellow-600" /><br />
           </div>
