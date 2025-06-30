@@ -1,5 +1,5 @@
 # Start Development Servers Script
-Write-Host "Starting HexaFalls Development Environment..." -ForegroundColor Green
+Write-Host "Starting 0xKid Development Environment..." -ForegroundColor Green
 
 # Start Backend Server
 Write-Host "Starting Backend Server..." -ForegroundColor Yellow

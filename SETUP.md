@@ -1,4 +1,4 @@
-# HexaFalls Frontend-Backend Connection Setup
+# 0xKid Frontend-Backend Connection Setup
 
 ## Quick Start
 

@@ -20,6 +20,8 @@ import AuthProvider from './contexts/AuthContext';
 import AboutUs from './components/AboutUs';
 import CodeEditor from './components/CodeEditor';
 import ConnectionTest from './components/ConnectionTest';
+import Leaderboard from './components/Leaderboard';
+import ContactUs from './components/ContactUs';
 
 
 function AppContent() {
@@ -33,7 +35,7 @@ function AppContent() {
 
   return (
     <BrowserRouter>
-      <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900">
+      <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 overflow-x-hidden">
         <Routes>
           <Route path="/" element={
             <div>
@@ -43,7 +45,8 @@ function AppContent() {
           } />
           <Route path="/code-editor" element={<CodeEditor/>}/>
           <Route path="/about" element={<AboutUs />} />
-          
+          <Route path="/leaderboard" element={<Leaderboard />} />
+          <Route path="/contact" element={<ContactUs />} />
           {/* Protected Routes */}
           <Route path="/dashboard" element={
             <ProtectedRoute>
@@ -122,7 +125,7 @@ function AppContent() {
             {!isMentorOpen && (
               <button
                 onClick={() => setIsMentorOpen(true)}
-                className="fixed bottom-4 left-4 w-16 h-16 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-2xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-110 z-40"
+                className="fixed bottom-4 left-4 w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-lg sm:text-2xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-110 z-40"
               >
                 🤖
               </button>

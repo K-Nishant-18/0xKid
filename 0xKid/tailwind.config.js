@@ -5,6 +5,10 @@ module.exports = {
   content: ['./src/**/*.{js,jsx,ts,tsx}'],
   theme: {
     extend: {
+      screens: {
+        'xs': '475px',
+        ...defaultTheme.screens,
+      },
       fontFamily: {
         'gf-title': ['"Creepster"', 'cursive'],
         'gf-heading': ['"Special Elite"', 'cursive'],
@@ -46,6 +50,26 @@ module.exports = {
           '50%': { transform: 'scale(1.05)', opacity: '0.7' },
         },
       },
+      spacing: {
+        '18': '4.5rem',
+        '88': '22rem',
+        '128': '32rem',
+      },
+      fontSize: {
+        'xs': ['0.75rem', { lineHeight: '1rem' }],
+        'sm': ['0.875rem', { lineHeight: '1.25rem' }],
+        'base': ['1rem', { lineHeight: '1.5rem' }],
+        'lg': ['1.125rem', { lineHeight: '1.75rem' }],
+        'xl': ['1.25rem', { lineHeight: '1.75rem' }],
+        '2xl': ['1.5rem', { lineHeight: '2rem' }],
+        '3xl': ['1.875rem', { lineHeight: '2.25rem' }],
+        '4xl': ['2.25rem', { lineHeight: '2.5rem' }],
+        '5xl': ['3rem', { lineHeight: '1' }],
+        '6xl': ['3.75rem', { lineHeight: '1' }],
+        '7xl': ['4.5rem', { lineHeight: '1' }],
+        '8xl': ['6rem', { lineHeight: '1' }],
+        '9xl': ['8rem', { lineHeight: '1' }],
+      },
     },
   },
   plugins: [
@@ -73,6 +97,38 @@ module.exports = {
           padding: '0.5rem',
           'border-radius': '4px',
           'border-left': '3px solid #ff9e00',
+        },
+        '.mobile-only': {
+          '@media (min-width: 768px)': {
+            display: 'none',
+          },
+        },
+        '.tablet-up': {
+          display: 'none',
+          '@media (min-width: 768px)': {
+            display: 'block',
+          },
+        },
+        '.desktop-up': {
+          display: 'none',
+          '@media (min-width: 1024px)': {
+            display: 'block',
+          },
+        },
+        '.text-responsive': {
+          fontSize: 'clamp(0.875rem, 2vw, 1rem)',
+        },
+        '.text-responsive-lg': {
+          fontSize: 'clamp(1.125rem, 3vw, 1.5rem)',
+        },
+        '.text-responsive-xl': {
+          fontSize: 'clamp(1.5rem, 4vw, 2rem)',
+        },
+        '.text-responsive-2xl': {
+          fontSize: 'clamp(2rem, 5vw, 3rem)',
+        },
+        '.text-responsive-3xl': {
+          fontSize: 'clamp(2.5rem, 6vw, 4rem)',
         },
       };
       addUtilities(newUtilities, ['responsive', 'hover']);

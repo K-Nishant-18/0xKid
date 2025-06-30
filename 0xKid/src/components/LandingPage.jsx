@@ -5,7 +5,8 @@ import {
   Sparkles, BookOpen, Users, Heart, Globe, Zap,
   Play, Star, Rocket, Brain, Target, CheckCircle,
   ArrowRight, Home, Trophy, User as UserIcon,
-  ChevronDown, ChevronUp, Menu, X, Ghost, Compass
+  ChevronDown, ChevronUp, Menu, X, Ghost, Compass,
+  MailIcon
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import AuthModal from './AuthModal';
@@ -105,11 +106,13 @@ const safetyFeatures = [
 ];
 
 const navItems = [
-  { name: 'Home', icon: <Home className="w-5 h-5" />, path: '/' },
-  { name: 'Code Journal', icon: <BookOpen className="w-5 h-5" />, path: '/code-editor' },
+  // { name: 'Home', icon: <Home className="w-5 h-5" />, path: '/' },
+  { name: 'Code Playground', icon: <BookOpen className="w-5 h-5" />, path: '/code-editor' },
   { name: 'About the Shack', icon: <Users className="w-5 h-5" />, path: '/about' },
   { name: 'Mystery Board', icon: <Trophy className="w-5 h-5" />, path: '/leaderboard' },
-  { name: 'Detective Profile', icon: <UserIcon className="w-5 h-5" />, path: '/profile' },
+  { name: 'Contact Us', icon: <MailIcon className="w-5 h-5" />, path: '/contact' },
+  
+
 ];
 
 const LandingPage = () => {
@@ -201,18 +204,18 @@ const LandingPage = () => {
         initial={{ backgroundColor: 'transparent', backdropFilter: 'blur(0)' }}
         animate={controls}
       >
-        <div className="flex items-center justify-between p-4 md:p-6 max-w-7xl mx-auto">
+        <div className="flex items-center justify-between p-3 sm:p-4 md:p-6 max-w-7xl mx-auto">
           <div className="flex items-center gap-2 z-50">
-            <Ghost className="w-8 h-8 text-yellow-200" />
-            <span className="text-2xl font-bold bg-gradient-to-r from-blue-300 to-yellow-600 bg-clip-text text-transparent">
-              Mystery Shack Code
+            <Ghost className="w-6 h-6 sm:w-8 sm:h-8 text-yellow-200" />
+            <span className="text-lg sm:text-xl md:text-2xl font-bold bg-gradient-to-r from-blue-300 to-yellow-600 bg-clip-text text-transparent">
+              0xKid
             </span>
           </div>
 
           {/* Desktop Menu */}
           <div className="hidden md:block">
             <motion.div 
-              className="ml-10 flex items-center space-x-8"
+              className="ml-6 sm:ml-8 lg:ml-10 flex items-center space-x-4 sm:space-x-6 lg:space-x-8"
               variants={containerVariants}
               initial="hidden"
               animate="visible"
@@ -226,29 +229,29 @@ const LandingPage = () => {
                 >
                   <Link
                     to={item.path}
-                    className="flex items-center px-1 py-2 rounded-md text-sm font-medium text-gray-300 hover:text-yellow-200 hover:bg-gray-800/50 transition-all duration-200"
+                    className="flex items-center px-1 py-2 rounded-md text-xs sm:text-sm font-medium text-gray-300 hover:text-yellow-200 hover:bg-gray-800/50 transition-all duration-200"
                   >
-                    <span className="mr-2">{item.icon}</span>
-                    {item.name}
+                    <span className="mr-1 sm:mr-2">{item.icon}</span>
+                    <span className="hidden lg:inline">{item.name}</span>
                   </Link>
                 </motion.div>
               ))}
             </motion.div>
           </div>
 
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 sm:gap-4">
             <button
               onClick={handleSignIn}
-              className="hidden md:block text-gray-300 hover:text-yellow-200 transition-colors"
+              className="hidden md:block text-gray-300 hover:text-yellow-200 transition-colors text-sm"
             >
               Sign In
             </button>
             <button
               onClick={handleGetStarted}
-              className="bg-gradient-to-r from-yellow-600 to-red-800 hover:from-yellow-700 hover:to-red-900 px-4 py-2 md:px-6 md:py-2 rounded-full font-semibold transition-all duration-300 transform hover:scale-105 text-yellow-200"
+              className="bg-gradient-to-r from-yellow-600 to-red-800 hover:from-yellow-700 hover:to-red-900 px-3 sm:px-4 md:px-6 py-1.5 sm:py-2 rounded-full font-semibold transition-all duration-300 transform hover:scale-105 text-yellow-200 text-xs sm:text-sm"
             >
-              <span className="hidden md:inline">Begin Mystery</span>
-              <span className="md:hidden">Start</span>
+              <span className="hidden sm:inline">Begin Mystery</span>
+              <span className="sm:hidden">Start</span>
             </button>
           </div>
 
@@ -260,9 +263,9 @@ const LandingPage = () => {
               aria-label="Toggle menu"
             >
               {isMenuOpen ? (
-                <X className="h-6 w-6" />
+                <X className="h-5 w-5 sm:h-6 sm:w-6" />
               ) : (
-                <Menu className="h-6 w-6" />
+                <Menu className="h-5 w-5 sm:h-6 sm:w-6" />
               )}
             </button>
           </div>
@@ -275,12 +278,12 @@ const LandingPage = () => {
           transition={{ duration: 0.3 }}
           className="md:hidden bg-gray-900/95 backdrop-blur-sm overflow-hidden"
         >
-          <div className="px-4 pt-2 pb-4 space-y-2">
+          <div className="px-4 pt-2 pb-4 space-y-1">
             {navItems.map((item) => (
               <Link
                 key={item.name}
                 to={item.path}
-                className="flex items-center px-3 py-3 rounded-md text-base font-medium text-gray-300 hover:text-yellow-200 hover:bg-gray-800/50 transition-all duration-200 block"
+                className="flex items-center px-3 py-2.5 rounded-md text-sm font-medium text-gray-300 hover:text-yellow-200 hover:bg-gray-800/50 transition-all duration-200 block"
                 onClick={() => setIsMenuOpen(false)}
               >
                 <span className="mr-3">{item.icon}</span>
@@ -290,7 +293,7 @@ const LandingPage = () => {
             <div className="pt-2 border-t border-yellow-800/50">
               <button
                 onClick={handleSignIn}
-                className="w-full flex items-center justify-center px-3 py-3 rounded-md text-base font-medium text-gray-300 hover:text-yellow-200 hover:bg-gray-800/50 transition-all duration-200"
+                className="w-full flex items-center justify-center px-3 py-2.5 rounded-md text-sm font-medium text-gray-300 hover:text-yellow-200 hover:bg-gray-800/50 transition-all duration-200"
               >
                 Sign In
               </button>
@@ -300,11 +303,11 @@ const LandingPage = () => {
       </motion.nav>
 
       {/* Hero Section */}
-      <section className="relative min-h-screen flex items-center justify-center px-4 pt-24 pb-16">
+      <section className="relative min-h-screen flex items-center justify-center px-4 pt-32 sm:pt-36 md:pt-44 pb-8 sm:pb-12 md:pb-16">
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-blue-600/20 rounded-full blur-3xl animate-pulse"></div>
-          <div className="absolute top-3/4 right-1/4 w-96 h-96 bg-yellow-600/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
-          <div className="absolute bottom-1/4 left-1/3 w-48 h-48 bg-green-600/20 rounded-full blur-3xl animate-pulse delay-500"></div>
+          <div className="absolute top-1/4 left-1/4 w-32 h-32 sm:w-48 sm:h-48 md:w-64 md:h-64 bg-blue-600/20 rounded-full blur-3xl animate-pulse"></div>
+          <div className="absolute top-3/4 right-1/4 w-48 h-48 sm:w-72 sm:h-72 md:w-96 md:h-96 bg-yellow-600/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
+          <div className="absolute bottom-1/4 left-1/3 w-24 h-24 sm:w-36 sm:h-36 md:w-48 md:h-48 bg-green-600/20 rounded-full blur-3xl animate-pulse delay-500"></div>
         </div>
 
         <div className="relative z-10 text-center max-w-6xl mx-auto">
@@ -312,19 +315,19 @@ const LandingPage = () => {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
-            className="mb-8"
+            className="mb-6 sm:mb-8"
           >
-            <div className="flex items-center justify-center gap-3 mb-6 flex-wrap">
-              <Ghost className="w-8 h-8 md:w-12 md:h-12 text-blue-300" />
-              <h1 className="text-5xl sm:text-6xl md:text-8xl font-bold bg-gradient-to-r from-blue-300 to-yellow-600 bg-clip-text text-transparent">
-                Mystery Shack Code
+            <div className="flex items-center justify-center gap-2 sm:gap-3 mb-4 sm:mb-6 flex-wrap">
+              <Ghost className="w-6 h-6 sm:w-8 sm:h-8 md:w-12 md:h-12 text-blue-300" />
+              <h1 className="text-3xl sm:text-4xl md:text-6xl lg:text-8xl font-bold bg-gradient-to-r from-blue-300 to-yellow-600 bg-clip-text text-transparent">
+                0xKid
               </h1>
-              <BookOpen className="w-8 h-8 md:w-12 md:h-12 text-yellow-200" />
+              <BookOpen className="w-6 h-6 sm:w-8 sm:h-8 md:w-12 md:h-12 text-yellow-200" />
             </div>
-            <p className="text-xl sm:text-2xl md:text-3xl font-semibold text-gray-300 mb-4">
+            <p className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-semibold text-gray-300 mb-3 sm:mb-4">
               Where Mysteries & Code Unravel
             </p>
-            <p className="text-base md:text-lg lg:text-xl text-gray-400 max-w-3xl mx-auto">
+            <p className="text-sm sm:text-base md:text-lg lg:text-xl text-gray-400 max-w-3xl mx-auto px-4">
               Join young detectives on an epic adventure through AI-guided mysteries, 
               supernatural projects, and mindful coding quests.
             </p>
@@ -334,17 +337,17 @@ const LandingPage = () => {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
-            className="flex flex-col sm:flex-row gap-4 justify-center mb-12"
+            className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center mb-8 sm:mb-12"
           >
             <button
               onClick={handleGetStarted}
-              className="bg-gradient-to-r from-yellow-600 to-red-800 hover:from-yellow-700 hover:to-red-900 px-6 py-3 md:px-8 md:py-4 rounded-full text-lg md:text-xl font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl flex items-center gap-2 justify-center text-yellow-200"
+              className="bg-gradient-to-r from-yellow-600 to-red-800 hover:from-yellow-700 hover:to-red-900 px-4 sm:px-6 md:px-8 py-2.5 sm:py-3 md:py-4 rounded-full text-base sm:text-lg md:text-xl font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl flex items-center gap-2 justify-center text-yellow-200"
             >
-              <Play className="w-5 h-5 md:w-6 md:h-6" />
+              <Play className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6" />
               Start Your Mystery
             </button>
-            <button className="bg-gray-800/50 hover:bg-gray-700/50 backdrop-blur-sm border border-yellow-800/50 hover:border-yellow-800/30 px-6 py-3 md:px-8 md:py-4 rounded-full text-lg md:text-xl font-semibold transition-all duration-300 flex items-center gap-2 justify-center text-yellow-200">
-              <Rocket className="w-5 h-5 md:w-6 md:h-6" />
+            <button className="bg-gray-800/50 hover:bg-gray-700/50 backdrop-blur-sm border border-yellow-800/50 hover:border-yellow-800/30 px-4 sm:px-6 md:px-8 py-2.5 sm:py-3 md:py-4 rounded-full text-base sm:text-lg md:text-xl font-semibold transition-all duration-300 flex items-center gap-2 justify-center text-yellow-200">
+              <Rocket className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6" />
               Watch Demo
             </button>
           </motion.div>
@@ -353,34 +356,34 @@ const LandingPage = () => {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
-            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 max-w-4xl mx-auto"
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-6 max-w-4xl mx-auto"
           >
             {[
               {
-                icon: <Brain className="w-10 h-10 md:w-12 md:h-12 text-blue-300" />,
+                icon: <Brain className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 text-blue-300" />,
                 title: "AI Code Guide",
                 description: "Personalized clues from your AI mentor"
               },
               {
-                icon: <Target className="w-10 h-10 md:w-12 md:h-12 text-yellow-600" />,
+                icon: <Target className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 text-yellow-600" />,
                 title: "Mystery Quests",
                 description: "Learn through cryptic adventures"
               },
               {
-                icon: <Heart className="w-10 h-10 md:w-12 md:h-12 text-red-600" />,
+                icon: <Heart className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 text-red-600" />,
                 title: "Mindful Coding",
                 description: "Balanced approach to mysteries and wellness"
               }
             ].map((item, index) => (
               <div 
                 key={index} 
-                className="bg-gray-800/50 backdrop-blur-sm rounded-xl md:rounded-2xl p-4 md:p-6 border border-yellow-800/50"
+                className="bg-gray-800/50 backdrop-blur-sm rounded-xl md:rounded-2xl p-3 sm:p-4 md:p-6 border border-yellow-800/50"
               >
-                <div className="mb-3 md:mb-4 mx-auto flex justify-center">
+                <div className="mb-2 sm:mb-3 md:mb-4 mx-auto flex justify-center">
                   {item.icon}
                 </div>
-                <h3 className="text-lg md:text-xl font-semibold mb-1 md:mb-2 text-center text-yellow-200">{item.title}</h3>
-                <p className="text-sm md:text-base text-gray-300 text-center">{item.description}</p>
+                <h3 className="text-base sm:text-lg md:text-xl font-semibold mb-1 sm:mb-2 text-center text-yellow-200">{item.title}</h3>
+                <p className="text-xs sm:text-sm md:text-base text-gray-300 text-center">{item.description}</p>
               </div>
             ))}
           </motion.div>
@@ -563,7 +566,7 @@ const LandingPage = () => {
             <div>
               <div className="flex items-center gap-2 mb-3 md:mb-4">
                 <Ghost className="w-5 h-5 md:w-6 md:h-6 text-yellow-200" />
-                <span className="text-lg md:text-xl font-bold text-yellow-200">Mystery Shack Code</span>
+                <span className="text-lg md:text-xl font-bold text-yellow-200">0xKid</span>
               </div>
               <p className="text-gray-400 text-xs md:text-sm">
                 Empowering young detectives with AI-guided coding mysteries.
@@ -598,7 +601,7 @@ const LandingPage = () => {
             </div>
           </div>
           <div className="border-t border-yellow-800/50 mt-8 pt-8 text-center text-gray-400 text-xs md:text-sm">
-            <p>© {new Date().getFullYear()} Mystery Shack Code. All rights reserved. Made with 🌟 for young detectives everywhere.</p>
+            <p>© {new Date().getFullYear()} 0xKid. All rights reserved. Made with 🌟 for young detectives everywhere.</p>
           </div>
         </div>
       </footer>

@@ -130,20 +130,20 @@ const NotificationCenter = ({ isOpen, onClose }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-start justify-center pt-16 p-4">
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-start justify-center pt-12 sm:pt-16 p-3 sm:p-4">
       <motion.div
         initial={{ opacity: 0, y: -20, scale: 0.95 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         exit={{ opacity: 0, y: -20, scale: 0.95 }}
-        className="bg-gradient-to-br from-purple-900/90 to-blue-900/90 backdrop-blur-md rounded-2xl w-full max-w-md border border-white/20 shadow-2xl"
+        className="bg-gradient-to-br from-purple-900/90 to-blue-900/90 backdrop-blur-md rounded-xl sm:rounded-2xl w-full max-w-sm sm:max-w-md border border-white/20 shadow-2xl max-h-[80vh] overflow-hidden"
       >
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-white/20">
-          <div className="flex items-center gap-3">
-            <Bell className="w-6 h-6 text-purple-400" />
-            <h2 className="text-xl font-bold text-white">Notifications</h2>
+        <div className="flex items-center justify-between p-4 sm:p-6 border-b border-white/20">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <Bell className="w-5 h-5 sm:w-6 sm:h-6 text-purple-400" />
+            <h2 className="text-lg sm:text-xl font-bold text-white">Notifications</h2>
             {unreadCount > 0 && (
-              <div className="bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full">
+              <div className="bg-red-500 text-white text-xs font-bold px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full">
                 {unreadCount}
               </div>
             )}
@@ -152,27 +152,27 @@ const NotificationCenter = ({ isOpen, onClose }) => {
             {unreadCount > 0 && (
               <button
                 onClick={markAllAsRead}
-                className="text-sm text-purple-400 hover:text-purple-300 transition-colors"
+                className="text-xs sm:text-sm text-purple-400 hover:text-purple-300 transition-colors"
               >
                 Mark all read
               </button>
             )}
             <button
               onClick={onClose}
-              className="p-2 text-gray-400 hover:text-white hover:bg-white/10 rounded-lg transition-colors"
+              className="p-1.5 sm:p-2 text-gray-400 hover:text-white hover:bg-white/10 rounded-lg transition-colors"
             >
-              <X className="w-5 h-5" />
+              <X className="w-4 h-4 sm:w-5 sm:h-5" />
             </button>
           </div>
         </div>
 
         {/* Notifications List */}
-        <div className="max-h-96 overflow-y-auto">
+        <div className="max-h-64 sm:max-h-96 overflow-y-auto">
           {notifications.length === 0 ? (
-            <div className="p-8 text-center">
-              <Bell className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-              <p className="text-gray-400">No notifications yet</p>
-              <p className="text-sm text-gray-500 mt-1">We'll let you know when something happens!</p>
+            <div className="p-6 sm:p-8 text-center">
+              <Bell className="w-8 h-8 sm:w-12 sm:h-12 text-gray-400 mx-auto mb-3 sm:mb-4" />
+              <p className="text-gray-400 text-sm sm:text-base">No notifications yet</p>
+              <p className="text-xs sm:text-sm text-gray-500 mt-1">We'll let you know when something happens!</p>
             </div>
           ) : (
             <div className="p-2">
@@ -184,62 +184,50 @@ const NotificationCenter = ({ isOpen, onClose }) => {
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, x: 20 }}
                     transition={{ delay: index * 0.05 }}
-                    className={`p-4 m-2 rounded-lg border transition-all cursor-pointer ${
+                    className={`p-3 sm:p-4 m-1 sm:m-2 rounded-lg border transition-all cursor-pointer ${
                       getNotificationColor(notification.type)
                     } ${
                       !notification.read ? 'ring-1 ring-white/20' : 'opacity-75'
                     }`}
                     onClick={() => markAsRead(notification.id)}
                   >
-                    <div className="flex items-start gap-3">
-                      <div className="flex-shrink-0 mt-1">
+                    <div className="flex items-start gap-2 sm:gap-3">
+                      <div className="flex-shrink-0 mt-0.5 sm:mt-1">
                         {getNotificationIcon(notification.type)}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <div className="flex items-start justify-between">
-                          <h4 className="font-semibold text-white text-sm">
+                        <div className="flex items-start justify-between gap-2">
+                          <h4 className="font-semibold text-white text-xs sm:text-sm leading-tight">
                             {notification.title}
                           </h4>
-                          <div className="flex items-center gap-2 ml-2">
-                            <span className="text-xs text-gray-400 whitespace-nowrap">
-                              {formatTimestamp(notification.timestamp)}
-                            </span>
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                deleteNotification(notification.id);
-                              }}
-                              className="p-1 text-gray-400 hover:text-red-400 transition-colors"
-                            >
-                              <X className="w-3 h-3" />
-                            </button>
-                          </div>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              deleteNotification(notification.id);
+                            }}
+                            className="text-gray-400 hover:text-red-400 transition-colors p-1"
+                          >
+                            <X className="w-3 h-3 sm:w-4 sm:h-4" />
+                          </button>
                         </div>
-                        <p className="text-gray-300 text-sm mt-1 leading-relaxed">
+                        <p className="text-xs sm:text-sm text-gray-300 mt-1 leading-relaxed">
                           {notification.message}
                         </p>
-                        {notification.actionUrl && (
-                          <button className="mt-2 text-xs text-purple-400 hover:text-purple-300 transition-colors">
-                            View →
-                          </button>
-                        )}
+                        <div className="flex items-center justify-between mt-2">
+                          <span className="text-xs text-gray-400">
+                            {formatTimestamp(notification.timestamp)}
+                          </span>
+                          {!notification.read && (
+                            <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
+                          )}
+                        </div>
                       </div>
                     </div>
-                    {!notification.read && (
-                      <div className="absolute top-4 right-4 w-2 h-2 bg-blue-400 rounded-full"></div>
-                    )}
                   </motion.div>
                 ))}
               </AnimatePresence>
             </div>
           )}
-        </div>
-
-        {/* Footer */}
-        <div className="p-4 border-t border-white/20 text-center">
-          <button className="text-sm text-purple-400 hover:text-purple-300 transition-colors">
-            Notification Settings
-          </button>
         </div>
       </motion.div>
     </div>
